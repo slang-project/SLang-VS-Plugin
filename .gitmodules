@@ -1,0 +1,4 @@
+[submodule "SLang"]
+	path = SLang
+	url = https://github.com/Zouev/SLang
+	branch = master
