@@ -27,7 +27,7 @@ namespace SLangPlugin.Classification
         internal static FileExtensionToContentTypeDefinition SLangFileType = null;
 
         [Import]
-        internal IClassificationTypeRegistryService ClassificationTypeRegistry = null;
+        internal IClassificationTypeRegistryService ClassificationTypeRegistry = null; // Set via MEF
 
         [Import]
         internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
@@ -76,6 +76,13 @@ namespace SLangPlugin.Classification
         /// </summary>
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
+            //var tagger = new SLangTokenTagger(this._buffer);
+
+            //foreach (var tag in tagger.GetTags(spans))
+            //{
+            //    yield return new TagSpan<ClassificationTag>(tag.Span, new ClassificationTag(_SLangTypes[tag.Tag.type]));
+            //}
+
             foreach (var tagSpan in _aggregator.GetTags(spans))
             {
                 var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);

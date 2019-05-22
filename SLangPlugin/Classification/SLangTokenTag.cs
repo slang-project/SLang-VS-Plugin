@@ -49,15 +49,21 @@ namespace SLangPlugin.Classification
         public IEnumerable<ITagSpan<SLangTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
 
-            foreach (SnapshotSpan curSpan in spans)
+            if (spans.Count > 0)
             {
-                ITextSnapshotLine containingLine = curSpan.Start.GetContainingLine();
+                var curSpan = spans[0];
 
-                string wholeView = curSpan.GetText();
+            //foreach (SnapshotSpan curSpan in spans)
+            //{
+                //ITextSnapshotLine containingLine = curSpan.Start.GetContainingLine();
 
-                int curLoc = containingLine.Start.Position;
+                ITextSnapshot wholeSpanSnapshot = curSpan.Snapshot;
 
-                SLang.Reader reader = new SLang.Reader(containingLine.GetText());
+                //int curLoc = containingLine.Start.Position;
+
+                
+
+                SLang.Reader reader = new SLang.Reader(wholeSpanSnapshot.GetText());
                 SLang.Tokenizer tokenizer = new SLang.Tokenizer(reader, (SLang.Options)null);
 
                 SLang.Token token = tokenizer.getNextToken();
@@ -67,15 +73,30 @@ namespace SLangPlugin.Classification
                     SLangTokenType tokenType = ClassificationMapping.getTokenType(token.code);
                     if (tokenType != SLangTokenType.Ignore)
                     {
-                        SLang.Span span = token.span;
-                        int size = span.end.pos - span.begin.pos + 1;
-                        SnapshotSpan tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc + span.begin.pos - 2, size));
+                        Span currentTokenSpan = ConvertToSpan(token.span, wholeSpanSnapshot);
+                        SnapshotSpan tokenSpan = new SnapshotSpan(wholeSpanSnapshot, currentTokenSpan);
                         if (tokenSpan.IntersectsWith(curSpan))
                             yield return new TagSpan<SLangTokenTag>(tokenSpan, new SLangTokenTag(tokenType));
                     }
                     token = tokenizer.getNextToken();
                 }
             }
+        }
+
+        /*
+         * TODO: write description
+         */
+        private Span ConvertToSpan(SLang.Span span, ITextSnapshot containingSnapshot)
+        {
+            int beginLine = span.begin.line,
+                endLine = span.end.line,
+                beginPos = span.begin.pos,
+                endPos = span.end.pos;
+
+            int begin = containingSnapshot.GetLineFromLineNumber(beginLine - 1).Start + beginPos;
+            int end = System.Math.Min(containingSnapshot.GetLineFromLineNumber(endLine - 1).Start + endPos, containingSnapshot.GetLineFromLineNumber(containingSnapshot.LineCount - 1).End);
+            int length = end - begin + 1;
+            return new Span(begin - 2, length);
         }
     }
 }
