@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
@@ -10,10 +12,19 @@ using Microsoft.VisualStudio.Language.StandardClassification;
 
 namespace SLangPlugin.Classification
 {
-    [Export(typeof(ITaggerProvider))]
+    public class SLangTokenTag : ITag
+    {
+        public SLangTokenType type { get; private set; }
+
+        public SLangTokenTag(SLangTokenType type)
+        {
+            this.type = type;
+        }
+    }
+
+    [Export(typeof(IClassifierProvider))]
     [ContentType("SLang")]
-    [TagType(typeof(ClassificationTag))]
-    internal sealed class SLangClassifierProvider : ITaggerProvider
+    internal sealed class SLangClassifierProvider : IClassifierProvider
     {
 
         [Export]
@@ -27,69 +38,104 @@ namespace SLangPlugin.Classification
         internal static FileExtensionToContentTypeDefinition SLangFileType = null;
 
         [Import]
-        internal IClassificationTypeRegistryService ClassificationTypeRegistry = null; // Set via MEF
+        internal IClassificationTypeRegistryService classificationTypeRegistry = null; // Set via MEF
 
-        [Import]
-        internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
-
-        public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
         {
-
-            ITagAggregator<SLangTokenTag> SLangTagAggregator =
-                                            aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
-
-            return new SLangClassifier(buffer, SLangTagAggregator, ClassificationTypeRegistry) as ITagger<T>;
+            return textBuffer.Properties.GetOrCreateSingletonProperty<SLangClassifier>( creator: () => new SLangClassifier(this.classificationTypeRegistry) );
         }
+
     }
 
-    internal sealed class SLangClassifier : ITagger<ClassificationTag>
+    internal sealed class SLangClassifier : IClassifier
     {
-        ITextBuffer _buffer;
-        ITagAggregator<SLangTokenTag> _aggregator;
-        IDictionary<SLangTokenType, IClassificationType> _SLangTypes;
 
+        private static readonly IList<ClassificationSpan> emptyList = new List<ClassificationSpan>(capacity: 0).AsReadOnly();
+
+        IDictionary<SLangTokenType, IClassificationType> _SLangTypes;
+        private IList<ClassificationSpan> lastSpans = emptyList;
+        private ITextSnapshot lastSnapshot;
         /// <summary>
         /// Construct the classifier and define search tokens
         /// </summary>
-        internal SLangClassifier(ITextBuffer buffer,
-                               ITagAggregator<SLangTokenTag> SLangTagAggregator,
-                               IClassificationTypeRegistryService typeService)
+        internal SLangClassifier(IClassificationTypeRegistryService typeService)
         {
-            _buffer = buffer;
-            _aggregator = SLangTagAggregator;
             _SLangTypes = new Dictionary<SLangTokenType, IClassificationType>();
             _SLangTypes[SLangTokenType.Identifier] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Identifier);
             _SLangTypes[SLangTokenType.Keyword] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Keyword);
             _SLangTypes[SLangTokenType.Comment] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Comment);
             _SLangTypes[SLangTokenType.Operator] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Operator);
             _SLangTypes[SLangTokenType.StringLiteral] = typeService.GetClassificationType(PredefinedClassificationTypeNames.String);
+            _SLangTypes[SLangTokenType.NumericLiteral] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Number);
+            _SLangTypes[SLangTokenType.Other] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Other);
+            _SLangTypes[SLangTokenType.Ignore] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Other); // should not be accessed anyway
+            _SLangTypes[SLangTokenType.Whitespace] = typeService.GetClassificationType(PredefinedClassificationTypeNames.WhiteSpace);
+
         }
 
-        public event EventHandler<SnapshotSpanEventArgs> TagsChanged
+        public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
+
+        public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
-            add { }
-            remove { }
+            var snapshot = span.Snapshot;
+            if (this.lastSnapshot == snapshot)
+                return lastSpans;
+
+            this.lastSnapshot = snapshot;
+            
+            return GetClassificationSpansAsync(snapshot).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        /// <summary>
-        /// Search the given span for any instances of classified tags
-        /// </summary>
-        public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        public async Task<IList<ClassificationSpan>> GetClassificationSpansAsync(ITextSnapshot span)
         {
-            //var tagger = new SLangTokenTagger(this._buffer);
+            //List<ClassificationSpan> tags = null;            
+            //Task tagger = new Task(() => { tags = GetTags(span).ToList(); });
+            //tagger.Start();
+            //await Task.WhenAll(tagger);
+            //return tags;
 
-            //foreach (var tag in tagger.GetTags(spans))
-            //{
-            //    yield return new TagSpan<ClassificationTag>(tag.Span, new ClassificationTag(_SLangTypes[tag.Tag.type]));
-            //}
+            //FIXME: async operation
+            //List<ClassificationSpan> tags = null;
+            //await new Task(() => { tags = GetTags(span).ToList(); });
+            //return tags;
 
-            foreach (var tagSpan in _aggregator.GetTags(spans))
+            return GetTags(span).ToList();
+        }
+
+        public IEnumerable<ClassificationSpan> GetTags(ITextSnapshot snapshot)
+        {
+            SLang.Reader reader = new SLang.Reader(snapshot.GetText());
+            SLang.Tokenizer tokenizer = new SLang.Tokenizer(reader, (SLang.Options)null);
+
+            SLang.Token token = tokenizer.getNextToken();
+
+            while (token.code != SLang.TokenCode.EOS)
             {
-                var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);
-                yield return
-                    new TagSpan<ClassificationTag>(tagSpans[0],
-                                                   new ClassificationTag(_SLangTypes[tagSpan.Tag.type]));
+                SLangTokenType tokenType = ClassificationMapping.getTokenType(token.code);
+                if (tokenType != SLangTokenType.Ignore)
+                {
+                    Span currentTokenSpan = ConvertToSpan(token.span, snapshot);
+                    SnapshotSpan tokenSpan = new SnapshotSpan(snapshot, currentTokenSpan);
+                    yield return new ClassificationSpan(tokenSpan, _SLangTypes[tokenType]);
+                }
+                token = tokenizer.getNextToken();
             }
         }
+
+        private Span ConvertToSpan(SLang.Span span, ITextSnapshot containingSnapshot)
+        {
+            int beginLine = span.begin.line - 1,
+                endLine = span.end.line - 1,
+                beginPos = span.begin.pos - 1,
+                endPos = span.end.pos - 1;
+
+            int begin = containingSnapshot.GetLineFromLineNumber(beginLine).Start + beginPos;
+            int containingSpanshotEnd = containingSnapshot.GetLineFromLineNumber(containingSnapshot.LineCount - 1).End;
+            int end = Math.Min(containingSnapshot.GetLineFromLineNumber(endLine).Start + endPos, containingSpanshotEnd);
+            int length = end - begin + 1;
+            return new Span(begin - 1, length);
+        }
+
+
     }
 }
