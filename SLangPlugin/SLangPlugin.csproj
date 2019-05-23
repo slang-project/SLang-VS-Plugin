@@ -54,6 +54,7 @@
     <Compile Include="Commands\CommandBindings.cs" />
     <Compile Include="Commands\CommentSelectedCommand.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="ErrorDetection\SquigglesTagger.cs" />
     <Compile Include="Outliner\OutliningTagger.cs" />
     <Compile Include="Outliner\OutliningTaggerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
