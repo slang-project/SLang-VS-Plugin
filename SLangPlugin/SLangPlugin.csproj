@@ -49,7 +49,11 @@
     <Compile Include="Classification\ClassificationMapping.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
+    <Compile Include="Classification\SLangTokenTag.cs" />
     <Compile Include="Classification\SLangTokenType.cs" />
+    <Compile Include="Commands\CommandBindings.cs" />
+    <Compile Include="Commands\CommentSelectedCommand.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SLangPluginPackage.cs" />
   </ItemGroup>
