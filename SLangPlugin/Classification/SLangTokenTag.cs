@@ -36,42 +36,62 @@ namespace SLangPlugin.Classification
     internal sealed class SLangTokenTagger : ITagger<SLangTokenTag>
     {
         ITextBuffer _buffer;
+        ITextSnapshot _snapshot;
+        IList<ITagSpan<SLangTokenTag>> _lastTags = new List<ITagSpan<SLangTokenTag>>();
 
         internal SLangTokenTagger(ITextBuffer buffer)
         {
             _buffer = buffer;
+            _snapshot = buffer.CurrentSnapshot;
+            PerformReTag();
         }
 
-        public event EventHandler<SnapshotSpanEventArgs> TagsChanged
+        public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+
+        private void PerformReTag()
         {
-            add { }
-            remove { }
+            _lastTags.Clear();
+            SLang.Reader reader = new SLang.Reader(_snapshot.GetText());
+            SLang.Tokenizer tokenizer = new SLang.Tokenizer(reader, (SLang.Options)null);
+
+            SLang.Token token = tokenizer.getNextToken();
+
+            while (token.code != SLang.TokenCode.EOS)
+            {
+                SLangTokenType tokenType = ClassificationMapping.getTokenType(token.code);
+                if (tokenType != SLangTokenType.Ignore)
+                {
+                    Span currentTokenSpan = ConvertToSpan(token.span, _snapshot);
+                    SnapshotSpan tokenSpan = new SnapshotSpan(_snapshot, currentTokenSpan);
+                    _lastTags.Add(new TagSpan<SLangTokenTag>(tokenSpan, new SLangTokenTag(tokenType)));
+                }
+                token = tokenizer.getNextToken();
+            }
+
         }
 
         public IEnumerable<ITagSpan<SLangTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            foreach (var currSpan in spans)
+            if (spans.Count > 0)
             {
-                var snapshot = currSpan.Snapshot;
-
-                SLang.Reader reader = new SLang.Reader(snapshot.GetText());
-                SLang.Tokenizer tokenizer = new SLang.Tokenizer(reader, (SLang.Options)null);
-
-                SLang.Token token = tokenizer.getNextToken();
-
-                while (token.code != SLang.TokenCode.EOS)
+                var snap = spans[0].Snapshot;
+                if (snap != _snapshot)
                 {
-                    SLangTokenType tokenType = ClassificationMapping.getTokenType(token.code);
-                    if (tokenType != SLangTokenType.Ignore)
-                    {
-                        Span currentTokenSpan = ConvertToSpan(token.span, snapshot);
-                        SnapshotSpan tokenSpan = new SnapshotSpan(snapshot, currentTokenSpan);
-                        if (tokenSpan.IntersectsWith(currSpan))
-                            yield return new TagSpan<SLangTokenTag>(tokenSpan, new SLangTokenTag(tokenType));
-                    }
-                    token = tokenizer.getNextToken();
+                    _snapshot = snap;
+                    PerformReTag();
+                    TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End)));
+                }
+
+                foreach (var tagSpan in _lastTags)
+                {
+                    yield return tagSpan;
                 }
             }
+            //foreach (var currSpan in spans)
+            //{
+                
+                
+            //}
         }
 
         private Span ConvertToSpan(SLang.Span span, ITextSnapshot containingSnapshot)

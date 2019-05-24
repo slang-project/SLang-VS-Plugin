@@ -55,6 +55,7 @@ namespace SLangPlugin.Classification
     {
 
         IDictionary<SLangTokenType, IClassificationType> _SLangTypes;
+        ITextSnapshot _snapshot;
         ITagAggregator<SLangTokenTag> _aggregator;
         ITextBuffer _buffer;
 
@@ -65,6 +66,7 @@ namespace SLangPlugin.Classification
                                ITagAggregator<SLangTokenTag> SLangTagAggregator, IStandardClassificationService typeService)
         {
             _buffer = buffer;
+            _snapshot = buffer.CurrentSnapshot;
             _aggregator = SLangTagAggregator;
             InitializeClassifierMapping(typeService);
         }
@@ -84,11 +86,7 @@ namespace SLangPlugin.Classification
 
         }
 
-        public event EventHandler<SnapshotSpanEventArgs> TagsChanged
-        {
-            add { }
-            remove { }
-        }
+        public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         //public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         //{
@@ -104,6 +102,7 @@ namespace SLangPlugin.Classification
 
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
+            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, _snapshot.GetLineFromLineNumber(_snapshot.LineCount-1).End)));
             foreach (var tagSpan in _aggregator.GetTags(spans))
             {
                 var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);
