@@ -21,7 +21,7 @@ namespace SLangPlugin.Classification
             { TokenCode.LComment, SLangTokenType.Comment },        //  long comment
             { TokenCode.DComment, SLangTokenType.Comment },        //  documenting comment
             { TokenCode.ERROR, SLangTokenType.Ignore },            //  illegal token
-            { TokenCode.Identifier, SLangTokenType.Identifier },   //
+            { TokenCode.Identifier, SLangTokenType.Unit },   //
             { TokenCode.Integer, SLangTokenType.NumericLiteral },  //
             { TokenCode.Real, SLangTokenType.NumericLiteral },     //
             { TokenCode.String,  SLangTokenType.StringLiteral },   //

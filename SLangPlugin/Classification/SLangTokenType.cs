@@ -8,6 +8,7 @@ namespace SLangPlugin.Classification
 {
     public enum SLangTokenType
     {
-        Identifier, Keyword, Comment, Operator, StringLiteral, NumericLiteral, Other, Ignore, Whitespace
+        Identifier, Keyword, Comment, Operator, StringLiteral, NumericLiteral, Other, Ignore, Whitespace,
+        Unit
     }
 }

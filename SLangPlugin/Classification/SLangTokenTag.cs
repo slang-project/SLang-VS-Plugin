@@ -87,11 +87,6 @@ namespace SLangPlugin.Classification
                     yield return tagSpan;
                 }
             }
-            //foreach (var currSpan in spans)
-            //{
-                
-                
-            //}
         }
 
         private Span ConvertToSpan(SLang.Span span, ITextSnapshot containingSnapshot)
@@ -104,7 +99,7 @@ namespace SLangPlugin.Classification
             int begin = containingSnapshot.GetLineFromLineNumber(beginLine).Start + beginPos;
             int containingSpanshotEnd = containingSnapshot.GetLineFromLineNumber(containingSnapshot.LineCount - 1).End;
             int end = Math.Min(containingSnapshot.GetLineFromLineNumber(endLine).Start + endPos, containingSpanshotEnd);
-            int length = end - begin + 1;
+            int length = end - begin;
             return new Span(begin - 1, length);
         }
     }

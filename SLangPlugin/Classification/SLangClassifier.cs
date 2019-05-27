@@ -34,14 +34,17 @@ namespace SLangPlugin.Classification
         internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
 
         [Import]
-        internal IStandardClassificationService classificationTypeRegistry = null; // Set via MEF
+        internal IStandardClassificationService standardClassificationService = null; // Set via MEF
+
+        [Import]
+        internal IClassificationTypeRegistryService classificationTypeRegistryService = null;
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             ITagAggregator<SLangTokenTag> SLangTagAggregator =
                                             aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
 
-            return new SLangClassifier(buffer, SLangTagAggregator, classificationTypeRegistry) as ITagger<T>;
+            return new SLangClassifier(buffer, SLangTagAggregator, standardClassificationService, classificationTypeRegistryService) as ITagger<T>;
         }
 
         //public IClassifier GetClassifier(ITextBuffer textBuffer)
@@ -63,18 +66,19 @@ namespace SLangPlugin.Classification
         /// Construct the classifier and define search tokens
         /// </summary>
         internal SLangClassifier(ITextBuffer buffer,
-                               ITagAggregator<SLangTokenTag> SLangTagAggregator, IStandardClassificationService typeService)
+                               ITagAggregator<SLangTokenTag> SLangTagAggregator, IStandardClassificationService typeService, IClassificationTypeRegistryService typeRegistry)
         {
             _buffer = buffer;
             _snapshot = buffer.CurrentSnapshot;
             _aggregator = SLangTagAggregator;
-            InitializeClassifierMapping(typeService);
+            InitializeClassifierMapping(typeService, typeRegistry);
+            buffer.Changed += updateAll;
         }
 
-        void InitializeClassifierMapping(IStandardClassificationService typeService)
+        void InitializeClassifierMapping(IStandardClassificationService typeService, IClassificationTypeRegistryService typeRegistry)
         {
             _SLangTypes = new Dictionary<SLangTokenType, IClassificationType>();
-            _SLangTypes[SLangTokenType.Identifier] = typeService.Identifier;
+            _SLangTypes[SLangTokenType.Identifier] = typeService.SymbolDefinition;
             _SLangTypes[SLangTokenType.Keyword] = typeService.Keyword;
             _SLangTypes[SLangTokenType.Comment] = typeService.Comment;
             _SLangTypes[SLangTokenType.Operator] = typeService.Operator;
@@ -83,7 +87,25 @@ namespace SLangPlugin.Classification
             _SLangTypes[SLangTokenType.Other] = typeService.Other;
             _SLangTypes[SLangTokenType.Ignore] = typeService.Other;
             _SLangTypes[SLangTokenType.Whitespace] = typeService.WhiteSpace;
+            _SLangTypes[SLangTokenType.Unit] = typeRegistry.GetClassificationType("unit");
+        }
 
+        public void updateAll(object obj, TextContentChangedEventArgs args)
+        {
+            bool containsSpanChange = false;
+            foreach (var change in args.Changes)
+            {
+                if (change.NewText.Contains("*") || change.NewText.Contains("/"))
+                {
+                    containsSpanChange = true;
+                    break;
+                }
+            }
+            if (!containsSpanChange)
+                return;
+
+            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
+                _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
@@ -102,7 +124,6 @@ namespace SLangPlugin.Classification
 
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, _snapshot.GetLineFromLineNumber(_snapshot.LineCount-1).End)));
             foreach (var tagSpan in _aggregator.GetTags(spans))
             {
                 var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);

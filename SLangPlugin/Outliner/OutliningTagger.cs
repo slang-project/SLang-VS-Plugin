@@ -111,7 +111,7 @@ namespace SLangPlugin.Outliner
                 int regionStart = -1;
                 string text = line.GetText();
 
-                //lines that contain a "[" denote the start of a new region.
+                //lines that contain "do/..." denote the start of a new region.
                 if ((regionStart = MinIndexOfSeveral(text, startHideList, StringComparison.Ordinal)) != -1)
                 {
                     int currentLevel = (currentRegion != null) ? currentRegion.Level : 1;
@@ -151,7 +151,7 @@ namespace SLangPlugin.Outliner
                         };
                     }
                 }
-                //lines that contain "]" denote the end of a region
+                //lines that contain "end" denote the end of a region
                 else if ((regionStart = text.IndexOf(endHide, StringComparison.Ordinal)) != -1)
                 {
                     int currentLevel = (currentRegion != null) ? currentRegion.Level : 1;
