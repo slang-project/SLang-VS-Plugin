@@ -1,10 +1,13 @@
 ﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace SLangPlugin.Outliner
 {
@@ -25,13 +28,20 @@ namespace SLangPlugin.Outliner
         string hoverText = "Unwrap block"; //the contents of the tooltip for the collapsed span
         ITextBuffer buffer;
         ITextSnapshot snapshot;
+        ITextEditorFactoryService _textEditorFactoryService;
+        IEditorOptionsFactoryService _editorOptionsFactoryService;
+        IProjectionBufferFactoryService _projectionBufferFactoryService;
+
         List<Region> regions;
 
         // Step #5: Add a tagger constructor that initializes the fields, parses the buffer, and adds an event handler to the Changed event.
-        public OutliningTagger(ITextBuffer buffer)
+        public OutliningTagger(ITextBuffer buffer, ITextEditorFactoryService textEditorFactoryService, IEditorOptionsFactoryService editorOptionsFactoryService, IProjectionBufferFactoryService projectionBufferFactoryService)
         {
             this.buffer = buffer;
             this.snapshot = buffer.CurrentSnapshot;
+            _textEditorFactoryService = textEditorFactoryService;
+            _editorOptionsFactoryService = editorOptionsFactoryService;
+            _projectionBufferFactoryService = projectionBufferFactoryService;
             this.regions = new List<Region>();
             this.ReParse();
             this.buffer.Changed += BufferChanged;
@@ -40,6 +50,161 @@ namespace SLangPlugin.Outliner
         // Step #6: Implement the GetTags method, which instantiates the tag spans. This example assumes that the spans in the 
         // NormalizedSpanCollection passed in to the method are contiguous, although this may not always be the case. This method 
         // instantiates a new tag span for each of the outlining regions.
+
+
+        private IWpfTextView CreateElisionBufferView(ITextBuffer finalBuffer)
+        {
+            return CreateShrunkenTextView(_textEditorFactoryService, finalBuffer);
+        }
+
+        internal static IWpfTextView CreateShrunkenTextView(
+            ITextEditorFactoryService textEditorFactoryService,
+            ITextBuffer finalBuffer)
+        {
+            //var roles = textEditorFactoryService.CreateTextViewRoleSet(OutliningRegionTextViewRole);
+            var view = textEditorFactoryService.CreateTextView(finalBuffer);
+
+            view.Background = Brushes.Transparent;
+
+            //view.SizeToFit();
+
+            // Zoom out a bit to shrink the text.
+            view.ZoomLevel *= 0.75;
+
+            return view;
+        }
+
+        //private ITextBuffer CreateElisionBuffer()
+        //{
+        //    // Remove any starting whitespace.
+        //    var span = TrimStartingNewlines(_hintSpan.GetSpan(_subjectBuffer.CurrentSnapshot));
+
+        //    // Trim the length if it's too long.
+        //    var shortSpan = span;
+        //    if (span.Length > MaxPreviewText)
+        //    {
+        //        shortSpan = ComputeShortSpan(span);
+        //    }
+
+        //    // Create an elision buffer for that span, also trimming the
+        //    // leading whitespace.
+        //    var elisionBuffer = CreateElisionBufferWithoutIndentation(_subjectBuffer, shortSpan);
+        //    var finalBuffer = elisionBuffer;
+
+        //    // If we trimmed the length, then make a projection buffer that
+        //    // has the above elision buffer and follows it with "..."
+        //    if (span.Length != shortSpan.Length)
+        //    {
+        //        finalBuffer = CreateTrimmedProjectionBuffer(elisionBuffer);
+        //    }
+
+        //    return finalBuffer;
+        //}
+
+        //private ITextBuffer CreateTrimmedProjectionBuffer(ITextBuffer elisionBuffer)
+        //{
+        //    // The elision buffer is too long.  We've already trimmed it, but now we want to add
+        //    // a "..." to it.  We do that by creating a projection of both the elision buffer and
+        //    // a new text buffer wrapping the ellipsis.
+        //    var elisionSpan = elisionBuffer.CurrentSnapshot.GetFullSpan();
+
+        //    var sourceSpans = new List<object>()
+        //        {
+        //            elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
+        //            Ellipsis
+        //        };
+
+        //    var projectionBuffer = _projectionBufferFactoryService.CreateProjectionBuffer(
+        //        projectionEditResolver: null,
+        //        sourceSpans: sourceSpans,
+        //        options: ProjectionBufferOptions.None);
+
+        //    return projectionBuffer;
+        //}
+
+        //private ITextBuffer CreateElisionBuffer(ITrackingSpan hintSpan, ITextBuffer subjectBuffer)
+        //{
+        //    // Remove any starting whitespace.
+        //    var span = TrimStartingNewlines(hintSpan.GetSpan(subjectBuffer.CurrentSnapshot), subjectBuffer);
+
+        //    // Trim the length if it's too long.
+        //    var shortSpan = span;
+        //    if (span.Length > 1000/*MaxPreviewText*/)
+        //    {
+        //        shortSpan = ComputeShortSpan(span, subjectBuffer);
+        //    }
+
+        //    // Create an elision buffer for that span, also trimming the
+        //    // leading whitespace.
+        //    var elisionBuffer = CreateElisionBufferWithoutIndentation(subjectBuffer, shortSpan);
+        //    var finalBuffer = elisionBuffer;
+
+        //    // If we trimmed the length, then make a projection buffer that
+        //    // has the above elision buffer and follows it with "..."
+        //    if (span.Length != shortSpan.Length)
+        //    {
+        //        finalBuffer = CreateTrimmedProjectionBuffer(elisionBuffer);
+        //    }
+
+        //    return finalBuffer;
+        //}
+
+        //public static SnapshotSpan GetFullSpan(this ITextSnapshot snapshot)
+        //{
+        //    //Contract.ThrowIfNull(snapshot);
+
+        //    return new SnapshotSpan(snapshot, new Span(0, snapshot.Length));
+        //}
+        //private ITextBuffer CreateTrimmedProjectionBuffer(ITextBuffer elisionBuffer)
+        //{
+        //    // The elision buffer is too long.  We've already trimmed it, but now we want to add
+        //    // a "..." to it.  We do that by creating a projection of both the elision buffer and
+        //    // a new text buffer wrapping the ellipsis.
+        //    var elisionSpan = GetFullSpan(elisionBuffer.CurrentSnapshot);
+
+        //    var sourceSpans = new List<object>()
+        //        {
+        //            elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
+        //            ellipsis
+        //        };
+
+        //    var projectionBuffer = _projectionBufferFactoryService.CreateProjectionBuffer(
+        //        projectionEditResolver: null,
+        //        sourceSpans: sourceSpans,
+        //        options: ProjectionBufferOptions.None);
+
+        //    return projectionBuffer;
+        //}
+
+        //private Span ComputeShortSpan(Span span, ITextBuffer subjectBuffer)
+        //{
+        //    var endIndex = span.Start + 1000/*MaxPreviewText*/;
+        //    var line = subjectBuffer.CurrentSnapshot.GetLineFromPosition(endIndex);
+
+        //    return Span.FromBounds(span.Start, line.EndIncludingLineBreak);
+        //}
+
+        //private Span TrimStartingNewlines(Span span, ITextBuffer subjectBuffer)
+        //{
+        //    while (span.Length > 1 && char.IsWhiteSpace(subjectBuffer.CurrentSnapshot[span.Start]))
+        //    {
+        //        span = new Span(span.Start + 1, span.Length - 1);
+        //    }
+
+        //    return span;
+        //}
+
+        //private ITextBuffer CreateElisionBufferWithoutIndentation(
+        //    ITextBuffer dataBuffer, Span shortHintSpan)
+        //{
+        //    _projectionBufferFactoryService.CreateElisionBuffer();
+        //    return _projectionBufferFactoryService.CreateElisionBufferWithoutIndentation(
+        //        _editorOptionsFactoryService.GlobalOptions,
+        //        contentType: null,
+        //        exposedSpans: new SnapshotSpan(dataBuffer.CurrentSnapshot, shortHintSpan));
+        //}
+
+
         public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (spans.Count == 0)
@@ -57,11 +222,14 @@ namespace SLangPlugin.Outliner
                     var startLine = currentSnapshot.GetLineFromLineNumber(region.StartLine);
                     var endLine = currentSnapshot.GetLineFromLineNumber(region.EndLine);
 
-                    //the region starts at the beginning of the "[", and goes until the *end* of the line that contains the "]".
+                    //the region starts at the beginning of the "do", and goes until the *end* of the line that contains the "end".
+                    
+                    SnapshotSpan cSpan = new SnapshotSpan(startLine.Start + region.StartOffset, endLine.End);
+
+                    var vi = CreateElisionBufferView(buffer);
                     yield return new TagSpan<IOutliningRegionTag>(
-                        new SnapshotSpan(startLine.Start + region.StartOffset,
-                        endLine.End),
-                        new OutliningRegionTag(false, false, ellipsis, hoverText));
+                        cSpan,
+                        new OutliningRegionTag(false, false, ellipsis, vi));
                 }
             }
         }

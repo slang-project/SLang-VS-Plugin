@@ -95,7 +95,7 @@ namespace SLangPlugin.Classification
             bool containsSpanChange = false;
             foreach (var change in args.Changes)
             {
-                if (change.NewText.Contains("*") || change.NewText.Contains("/"))
+                if (change.NewText.Contains("*") || change.NewText.Contains("/")) // detect if any
                 {
                     containsSpanChange = true;
                     break;

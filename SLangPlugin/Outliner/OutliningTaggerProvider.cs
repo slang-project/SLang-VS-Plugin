@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 using System;
@@ -22,11 +23,20 @@ namespace SLangPlugin.Outliner
     [ContentType(Constants.ContentType)]
     internal sealed class OutliningTaggerProvider : ITaggerProvider
     {
+        [Import]
+        ITextEditorFactoryService _textEditorFactoryService = null;
+
+        [Import]
+        IEditorOptionsFactoryService _editorOptionsFactoryService = null;
+
+        [Import]
+        IProjectionBufferFactoryService _projectionBufferFactoryService = null;
+
         // Step #2: Implement the CreateTagger method by adding an OutliningTagger to the properties of the buffer.
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             //create a single tagger for each buffer.
-            Func<ITagger<T>> sc = delegate () { return new OutliningTagger(buffer) as ITagger<T>; };
+            Func<ITagger<T>> sc = delegate () { return new OutliningTagger(buffer, _textEditorFactoryService, _editorOptionsFactoryService, _projectionBufferFactoryService) as ITagger<T>; };
             return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(sc);
         }
     }
