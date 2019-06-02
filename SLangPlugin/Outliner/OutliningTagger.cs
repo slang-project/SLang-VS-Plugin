@@ -33,13 +33,20 @@ namespace SLangPlugin.Outliner
         [Import]
         internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
 
+        //[Import]
+        IProjectionEditResolver projectionEditResolver = null;
+
+        [Import]
+        IContentTypeRegistryService contentTypeRegistryService = null;
+
         // Create a single tagger for each buffer.
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             ITagAggregator<SLangTokenTag> SLangTagAggregator =
                                             aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
 
-            Func<ITagger<T>> creator = delegate () { return new OutliningTagger(buffer, _textEditorFactoryService, _editorOptionsFactoryService, _projectionBufferFactoryService, SLangTagAggregator) as ITagger<T>; };
+            Func<ITagger<T>> creator = delegate () { return new OutliningTagger(buffer, _textEditorFactoryService,
+                _editorOptionsFactoryService, _projectionBufferFactoryService, SLangTagAggregator, contentTypeRegistryService) as ITagger<T>; };
             return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(creator);
         }
     }
@@ -57,6 +64,7 @@ namespace SLangPlugin.Outliner
         ITextEditorFactoryService _textEditorFactoryService;
         IEditorOptionsFactoryService _editorOptionsFactoryService;
         IProjectionBufferFactoryService _projectionBufferFactoryService;
+        IContentTypeRegistryService _contentTypeRegistryService;
 
         SLangTokenTagger _globalTagger;
         List<Region> _regions;
@@ -66,13 +74,15 @@ namespace SLangPlugin.Outliner
         public OutliningTagger(ITextBuffer buffer, ITextEditorFactoryService textEditorFactoryService,
             IEditorOptionsFactoryService editorOptionsFactoryService,
             IProjectionBufferFactoryService projectionBufferFactoryService,
-            ITagAggregator<SLangTokenTag> SLangTagAggregator)
+            ITagAggregator<SLangTokenTag> SLangTagAggregator,
+            IContentTypeRegistryService contentTypeRegistryService)
         {
             _buffer = buffer;
             _snapshot = buffer.CurrentSnapshot;
             _textEditorFactoryService = textEditorFactoryService;
             _editorOptionsFactoryService = editorOptionsFactoryService;
             _projectionBufferFactoryService = projectionBufferFactoryService;
+            _contentTypeRegistryService = contentTypeRegistryService;
             _aggregator = SLangTagAggregator;
 
             var generalTagger = buffer.Properties.GetOrCreateSingletonProperty<ITagger<SLangTokenTag>>(
@@ -99,6 +109,7 @@ namespace SLangPlugin.Outliner
 
             view.Background = Brushes.Transparent;
 
+            
             //view.SizeToFit();
 
             // Zoom out a bit to shrink the text.
@@ -142,10 +153,10 @@ namespace SLangPlugin.Outliner
         //    var elisionSpan = elisionBuffer.CurrentSnapshot.GetFullSpan();
 
         //    var sourceSpans = new List<object>()
-        //        {
-        //            elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
-        //            Ellipsis
-        //        };
+        //            {
+        //                elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
+        //                Ellipsis
+        //            };
 
         //    var projectionBuffer = _projectionBufferFactoryService.CreateProjectionBuffer(
         //        projectionEditResolver: null,
@@ -196,10 +207,10 @@ namespace SLangPlugin.Outliner
         //    var elisionSpan = GetFullSpan(elisionBuffer.CurrentSnapshot);
 
         //    var sourceSpans = new List<object>()
-        //        {
-        //            elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
-        //            ellipsis
-        //        };
+        //            {
+        //                elisionSpan.Snapshot.CreateTrackingSpan(elisionSpan, SpanTrackingMode.EdgeExclusive),
+        //                ellipsis
+        //            };
 
         //    var projectionBuffer = _projectionBufferFactoryService.CreateProjectionBuffer(
         //        projectionEditResolver: null,
@@ -227,15 +238,16 @@ namespace SLangPlugin.Outliner
         //    return span;
         //}
 
-        //private ITextBuffer CreateElisionBufferWithoutIndentation(
-        //    ITextBuffer dataBuffer, Span shortHintSpan)
-        //{
-        //    _projectionBufferFactoryService.CreateElisionBuffer();
-        //    return _projectionBufferFactoryService.CreateElisionBufferWithoutIndentation(
-        //        _editorOptionsFactoryService.GlobalOptions,
-        //        contentType: null,
-        //        exposedSpans: new SnapshotSpan(dataBuffer.CurrentSnapshot, shortHintSpan));
-        //}
+
+        //FIXME: wrongly passed into classifier
+        private ITextBuffer CreateElisionBuffer(ITextBuffer dataBuffer, Span shortHintSpan)
+        {
+            return _projectionBufferFactoryService.CreateElisionBuffer(
+                projectionEditResolver: null,
+                contentType: _contentTypeRegistryService.GetContentType(Constants.ContentType),
+                exposedSpans: new NormalizedSnapshotSpanCollection(dataBuffer.CurrentSnapshot, shortHintSpan),
+                options: ElisionBufferOptions.None);
+        }
 
 
         public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -256,8 +268,12 @@ namespace SLangPlugin.Outliner
                     var endLine = currentSnapshot.GetLineFromLineNumber(region.EndLine);
 
                     SnapshotSpan regionSpan = new SnapshotSpan(startLine.Start + region.StartOffset, endLine.End);
-                    
-                    var vi = CreateElisionBufferView(_buffer);
+
+
+                    var elisionBuffer = CreateElisionBuffer(_buffer, regionSpan);
+                    var vi = CreateElisionBufferView(elisionBuffer);
+
+                    var hover = regionSpan.GetText();
                     yield return new TagSpan<IOutliningRegionTag>(
                         regionSpan,
                         new OutliningRegionTag(false, false, ellipsis, vi));
