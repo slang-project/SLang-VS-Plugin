@@ -49,6 +49,7 @@
     <Compile Include="Classification\ClassificationMapping.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
+    <Compile Include="QuickInfo\QuickInfo.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="SLangTokenType.cs" />
     <Compile Include="Commands\CommandBindings.cs" />
