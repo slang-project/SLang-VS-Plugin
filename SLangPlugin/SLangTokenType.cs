@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SLangPlugin.Classification
+namespace SLangPlugin
 {
     public enum SLangTokenType
     {

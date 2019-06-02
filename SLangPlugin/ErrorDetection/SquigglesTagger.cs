@@ -33,14 +33,14 @@ namespace SLangPlugin.ErrorDetection
     internal sealed class SquigglesTagger : ITagger<IErrorTag>
     {
         private readonly ITextBuffer _sourceBuffer;
-        private readonly ITagAggregator<Classification.SLangTokenTag> _aggregator;
+        private readonly ITagAggregator<SLangTokenTag> _aggregator;
 
         internal SquigglesTagger(ITextBuffer buffer, IBufferTagAggregatorFactoryService aggregatorFactory)
         {
             this._sourceBuffer = buffer;
-            ITagAggregator<Classification.SLangTokenTag> sc()
+            ITagAggregator<SLangTokenTag> sc()
             {
-                return aggregatorFactory.CreateTagAggregator<Classification.SLangTokenTag>(buffer);
+                return aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
             }
             this._aggregator = buffer.Properties.GetOrCreateSingletonProperty(sc);
         }
@@ -49,9 +49,9 @@ namespace SLangPlugin.ErrorDetection
 
         public IEnumerable<ITagSpan<IErrorTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            foreach (IMappingTagSpan<Classification.SLangTokenTag> myTokenTag in this._aggregator.GetTags(spans))
+            foreach (IMappingTagSpan<SLangTokenTag> myTokenTag in this._aggregator.GetTags(spans))
             {
-                if (myTokenTag.Tag.type == Classification.SLangTokenType.NumericLiteral)
+                if (myTokenTag.Tag.type == SLangTokenType.NumericLiteral)
                 {
                     SnapshotSpan tagSpan = myTokenTag.Span.GetSpans(_sourceBuffer)[0];
                     yield return new TagSpan<IErrorTag>(tagSpan, new ErrorTag(PredefinedErrorTypeNames.SyntaxError, "Don't use numbers here!"));
