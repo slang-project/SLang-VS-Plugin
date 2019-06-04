@@ -24,7 +24,7 @@ Target version is Visual Studio 2019.
     - [ ] Go to definition (semantic api)
     - [ ] Peek definition (create wpf window view?)(semantic api)
     - [ ] Find all references (semantic api)
-- [x] **Code folding (Tagger)(Outlining) + (needs to be moved to AST interface)**
+- [x] **Code folding (Outlining) + (needs to be moved to AST interface)**
 - [ ] `.editorconfig` **features**
     - [ ] explicit integration into project
     - [ ] hidden integration
@@ -51,7 +51,7 @@ Target version is Visual Studio 2019.
 |Symbol|Default Color|In Hex|
 |-|-|-|
 |Undefined symbol|Dark gray||
-|Unit definition|Light teal|<span style="color:#4ec9b0;background-color:black;">#4ec9b0</span>|
-|Unit member routine definition|Light yellow|<span style="color:#dcdcaa;background-color:black;">#dcdcaa</span>|
+|Unit definition|Light Teal|#4ec9b0|
+|Unit member routine definition|Light Yellow|#dcdcaa|
 |||
 
