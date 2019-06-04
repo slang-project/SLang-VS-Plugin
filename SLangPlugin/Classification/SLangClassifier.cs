@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Language.StandardClassification;
+using System.ComponentModel.Composition;
 
 namespace SLangPlugin.Classification
 {
+
+    #region Tagger Provider
+
     [Export(typeof(ITaggerProvider))]
     [ContentType("SLang")]
     [TagType(typeof(ClassificationTag))]
@@ -27,62 +33,102 @@ namespace SLangPlugin.Classification
         internal static FileExtensionToContentTypeDefinition SLangFileType = null;
 
         [Import]
-        internal IClassificationTypeRegistryService ClassificationTypeRegistry = null;
+        internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
 
         [Import]
-        internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
+        internal IStandardClassificationService standardClassificationService = null; // Set via MEF
+
+        [Import]
+        internal IClassificationTypeRegistryService classificationTypeRegistryService = null;
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
-
             ITagAggregator<SLangTokenTag> SLangTagAggregator =
                                             aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
 
-            return new SLangClassifier(buffer, SLangTagAggregator, ClassificationTypeRegistry) as ITagger<T>;
+            Func<ITagger<T>> creator = delegate () { return new SLangClassifier(buffer, SLangTagAggregator,
+                standardClassificationService, classificationTypeRegistryService) as ITagger<T>; };
+            return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(creator);
         }
     }
 
+    #endregion
+
+    #region Tagger
+
     internal sealed class SLangClassifier : ITagger<ClassificationTag>
     {
+
         ITextBuffer _buffer;
+        ITextSnapshot _snapshot;
         ITagAggregator<SLangTokenTag> _aggregator;
         IDictionary<SLangTokenType, IClassificationType> _SLangTypes;
 
-        /// <summary>
-        /// Construct the classifier and define search tokens
-        /// </summary>
-        internal SLangClassifier(ITextBuffer buffer,
-                               ITagAggregator<SLangTokenTag> SLangTagAggregator,
-                               IClassificationTypeRegistryService typeService)
+        internal SLangClassifier(ITextBuffer buffer, ITagAggregator<SLangTokenTag> SLangTagAggregator,
+            IStandardClassificationService typeService, IClassificationTypeRegistryService typeRegistry)
         {
             _buffer = buffer;
+            _snapshot = buffer.CurrentSnapshot;
             _aggregator = SLangTagAggregator;
-            _SLangTypes = new Dictionary<SLangTokenType, IClassificationType>();
-            _SLangTypes[SLangTokenType.Identifier] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Identifier);
-            _SLangTypes[SLangTokenType.Keyword] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Keyword);
-            _SLangTypes[SLangTokenType.Comment] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Comment);
-            _SLangTypes[SLangTokenType.Operator] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Operator);
-            _SLangTypes[SLangTokenType.StringLiteral] = typeService.GetClassificationType(PredefinedClassificationTypeNames.String);
+            InitializeClassifierMapping(typeService, typeRegistry);
+            buffer.Changed += BufferChanged;
         }
 
-        public event EventHandler<SnapshotSpanEventArgs> TagsChanged
+        void InitializeClassifierMapping(IStandardClassificationService typeService, IClassificationTypeRegistryService typeRegistry)
         {
-            add { }
-            remove { }
+            _SLangTypes = new Dictionary<SLangTokenType, IClassificationType>();
+
+            _SLangTypes[SLangTokenType.Identifier] = typeService.SymbolDefinition;
+            _SLangTypes[SLangTokenType.Keyword] = typeService.Keyword;
+            _SLangTypes[SLangTokenType.Comment] = typeService.Comment;
+            _SLangTypes[SLangTokenType.Operator] = typeService.Operator;
+            _SLangTypes[SLangTokenType.StringLiteral] = typeService.StringLiteral;
+            _SLangTypes[SLangTokenType.NumericLiteral] = typeService.NumberLiteral;
+            _SLangTypes[SLangTokenType.Other] = typeService.Other;
+            _SLangTypes[SLangTokenType.Ignore] = typeService.Other;
+            _SLangTypes[SLangTokenType.Whitespace] = typeService.WhiteSpace;
+
+            _SLangTypes[SLangTokenType.Unit] = typeRegistry.GetClassificationType("unit");
         }
 
-        /// <summary>
-        /// Search the given span for any instances of classified tags
-        /// </summary>
+        public void BufferChanged(object obj, TextContentChangedEventArgs args)
+        {
+            //FIXME: Does not work for deleting comment symbols, maybe some other (semantic) considerations should be counted
+
+            //bool containsSpanChange = false;
+            //foreach (var change in args.Changes)
+            //{
+            //    if (change.NewText.Contains("*") || change.NewText.Contains("/")) // detect if any
+            //    {
+            //        containsSpanChange = true;
+            //        break;
+            //    }
+            //}
+            //if (!containsSpanChange)
+            //    return; 
+
+
+            // if current change does not correspond to latest version of buffer, ignore until newer
+            if (args.After != _buffer.CurrentSnapshot)
+                return;
+
+            _snapshot = _buffer.CurrentSnapshot;
+
+            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
+                _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
+        }
+
+        public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             foreach (var tagSpan in _aggregator.GetTags(spans))
             {
                 var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);
-                yield return
-                    new TagSpan<ClassificationTag>(tagSpans[0],
-                                                   new ClassificationTag(_SLangTypes[tagSpan.Tag.type]));
+                if (spans.IntersectsWith(tagSpans))
+                    yield return new TagSpan<ClassificationTag>(tagSpans[0], new ClassificationTag(_SLangTypes[tagSpan.Tag.type]));
             }
         }
     }
+    #endregion
 }
