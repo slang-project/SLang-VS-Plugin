@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLang", "SLang\SLang\SLang.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLang.ProjectTemplate", "SLang.ProjectTemplate\SLang.ProjectTemplate.csproj", "{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLang.ItemTemplate", "SLang.ItemTemplate\SLang.ItemTemplate.csproj", "{92EF7795-49F5-4590-886A-A6C909E4CFC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92EF7795-49F5-4590-886A-A6C909E4CFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92EF7795-49F5-4590-886A-A6C909E4CFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92EF7795-49F5-4590-886A-A6C909E4CFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92EF7795-49F5-4590-886A-A6C909E4CFC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

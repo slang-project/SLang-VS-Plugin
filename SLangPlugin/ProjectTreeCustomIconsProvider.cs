@@ -13,7 +13,7 @@ namespace SLangPlugin
     [Export(typeof(IProjectTreePropertiesProvider))]
     [AppliesTo(MyUnconfiguredProject.UniqueCapability)]
     // TODO: Consider removing the Order attribute as it typically should not be needed when creating a new project type. It may be needed when customizing an existing project type to override the default behavior (e.g. the default C# implementation).
-    [Order(1000)]
+    //[Order(1000)]
     internal class ProjectTreeCustomIconsProvider : IProjectTreePropertiesProvider
     {
         const string ITEM_TYPE = "SLangCompile";
@@ -35,7 +35,7 @@ namespace SLangPlugin
             {
                 propertyValues.Icon = customIconsMonikers.ItemIconImageMoniker.ToProjectSystemType();
             }
-            
+
 
         }
     }

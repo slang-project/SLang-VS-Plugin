@@ -94,6 +94,13 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2268" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SLang.ItemTemplate\SLang.ItemTemplate.csproj">
+      <Project>{92EF7795-49F5-4590-886A-A6C909E4CFC3}</Project>
+      <Name>SLang.ItemTemplate</Name>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
     <ProjectReference Include="..\SLang.ProjectTemplate\SLang.ProjectTemplate.csproj">
       <Project>{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}</Project>
       <Name>SLang.ProjectTemplate</Name>
