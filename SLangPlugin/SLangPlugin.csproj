@@ -49,7 +49,14 @@
     <Compile Include="Classification\ClassificationMapping.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
+    <Compile Include="customIconsMonikers.cs" />
+    <Compile Include="MyConfiguredProject.cs" />
+    <Compile Include="MyUnconfiguredProject.cs" />
+    <Compile Include="ProjectProperties.cs" />
+    <Compile Include="ProjectTreeCustomIconsProvider.cs" />
     <Compile Include="QuickInfo\QuickInfo.cs" />
+    <Compile Include="ScriptDebuggerLaunchProvider.cs" />
+    <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="SLangTokenType.cs" />
     <Compile Include="Commands\CommandBindings.cs" />
@@ -61,7 +68,9 @@
     <Compile Include="SLangPluginPackage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
+    <None Include="BuildSystem\DeployedBuildSystem\SLangProjectType.props" />
+    <None Include="BuildSystem\DeployedBuildSystem\SLangProjectType.targets" />
+    <None Include="customIcons.imagemanifest" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -72,10 +81,26 @@
     <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem">
+      <Version>15.8.243</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk">
+      <Version>15.8.243</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.Sdk.Tools">
+      <Version>15.8.243</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="15.9.3" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2268" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SLang.ProjectTemplate\SLang.ProjectTemplate.csproj">
+      <Project>{715E2840-D6C5-4B7E-98EA-F3F65FFE3A6D}</Project>
+      <Name>SLang.ProjectTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
     <ProjectReference Include="..\SLang\SLang\SLang.csproj">
       <Project>{e690b8ca-6137-4b11-84a5-00a3ab1eb149}</Project>
       <Name>SLang</Name>
@@ -83,6 +108,84 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="BuildSystem\Rules\debugger_general.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\folder.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\general.browseobject.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\general.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\general_file.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\none.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <None Include="BuildSystem\Rules\ProjectItemsSchema.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <XamlPropertyRule Include="BuildSystem\Rules\scc.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <None Include="BuildSystem\Rules\script.browseobject.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <XamlPropertyRule Include="BuildSystem\Rules\script.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\ScriptDebugger.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\SLangDebugger.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="BuildSystem\Rules\slang_compile.xaml">
+      <Generator>MSBuild:GenerateRuleSourceFromXaml</Generator>
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <Resource Include="Images\customIconsProjectIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
+    <Resource Include="Images\item_icon\item_icon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
+    <Resource Include="Images\project_icon\project_icon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\customIconsProjectIcon.png" />
+    <Resource Include="Images\item_icon\item_icon.png" />
+    <Resource Include="Images\project_icon\project_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SLangPluginPackage.resx">
+      <DependentUpon>SLangPluginPackage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -93,4 +196,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <BuildSystemToCopy Include="BuildSystem\DeployedBuildSystem\**\*" />
+      <RulesToCopy Include="BuildSystem\Rules\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuildSystemToCopy)" DestinationFiles="@(BuildSystemToCopy->'$(LocalAppData)\CustomProjectSystems\SLangProjectType\%(RecursiveDir)%(FileName)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RulesToCopy)" DestinationFiles="@(RulesToCopy->'$(LocalAppData)\CustomProjectSystems\SLangProjectType\Rules\%(RecursiveDir)%(FileName)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

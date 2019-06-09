@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                           xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
+  <Symbols>
+    <String Name="Resources" Value="/SLangPlugin;Component/" />
+    <Guid Name="customIconsGuid" Value="61fac2ec-24eb-4103-9db8-59e4c1ef7c14" />
+    <ID Name="ProjectIcon" Value="0" />
+    <ID Name="ItemIcon" Value="1" />
+  </Symbols>
+  <Images>
+    <Image Guid="$(customIconsGuid)" ID="$(ProjectIcon)">
+      <Source Uri="$(Resources)/Images/project_icon/project_icon.xaml" />
+      <Source Uri="$(Resources)/Images/project_icon/project_icon.png" >
+        <Size Value="16" />
+      </Source>  
+    </Image>
+    <Image Guid="$(customIconsGuid)" ID="$(ItemIcon)">
+      <Source Uri="$(Resources)/Images/item_icon/item_icon.xaml" />
+      <Source Uri="$(Resources)/Images/item_icon/item_icon.png" >
+        <Size Value="16" />
+      </Source>
+    </Image>
+  </Images>
+  <ImageLists />
+</ImageManifest>
