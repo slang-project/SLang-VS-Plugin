@@ -21,11 +21,6 @@ namespace SLangPlugin
         {
         }
 
-        // TODO: remove due to this export is 
-        //[ExportPropertyXamlRuleDefinition("SLangPlugin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9be6e469bc4921f1", "XamlRuleToCode:SLangDebugger.xaml", "Project")]
-        //[AppliesTo(MyUnconfiguredProject.UniqueCapability)]
-        //private object DebuggerXaml { get { throw new NotImplementedException(); } }
-
         /// <summary>
         /// Gets project properties that the debugger needs to launch.
         /// </summary>
