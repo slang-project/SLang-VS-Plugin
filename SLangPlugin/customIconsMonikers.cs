@@ -5,7 +5,7 @@ namespace SLangPlugin
 {
     public static class customIconsMonikers
     {
-        private static readonly Guid ManifestGuid = new Guid("61fac2ec-24eb-4103-9db8-59e4c1ef7c14");
+        private static readonly Guid ManifestGuid = new Guid("DE569D75-A6A3-421B-813C-802B35E6E00E");
 
         private const int ProjectIcon = 0;
         private const int ItemIcon = 1;

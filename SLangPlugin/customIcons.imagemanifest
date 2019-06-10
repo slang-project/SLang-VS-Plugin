@@ -4,7 +4,7 @@
                            xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
   <Symbols>
     <String Name="Resources" Value="/SLangPlugin;Component/" />
-    <Guid Name="customIconsGuid" Value="61fac2ec-24eb-4103-9db8-59e4c1ef7c14" />
+    <Guid Name="customIconsGuid" Value="DE569D75-A6A3-421B-813C-802B35E6E00E" />
     <ID Name="ProjectIcon" Value="0" />
     <ID Name="ItemIcon" Value="1" />
   </Symbols>
