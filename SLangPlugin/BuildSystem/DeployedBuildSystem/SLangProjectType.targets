@@ -62,6 +62,10 @@
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\slang_compile.xaml;">
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\SLangDebugger.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
   </ItemGroup>
 
   <Import Project="$(MSBuildProjectFullPath).user" Condition="Exists('$(MSBuildProjectFullPath).user')" />

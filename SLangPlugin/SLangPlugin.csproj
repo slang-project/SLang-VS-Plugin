@@ -55,7 +55,6 @@
     <Compile Include="ProjectProperties.cs" />
     <Compile Include="ProjectTreeCustomIconsProvider.cs" />
     <Compile Include="QuickInfo\QuickInfo.cs" />
-    <Compile Include="ScriptDebuggerLaunchProvider.cs" />
     <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="SLangTokenType.cs" />
@@ -155,9 +154,6 @@
       <SubType>Designer</SubType>
     </None>
     <XamlPropertyRule Include="BuildSystem\Rules\script.xaml">
-      <SubType>Designer</SubType>
-    </XamlPropertyRule>
-    <XamlPropertyRule Include="BuildSystem\Rules\ScriptDebugger.xaml">
       <SubType>Designer</SubType>
     </XamlPropertyRule>
     <XamlPropertyRule Include="BuildSystem\Rules\SLangDebugger.xaml">

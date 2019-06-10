@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.ProjectSystem.Debug;
 using Microsoft.VisualStudio.ProjectSystem.Properties;
 using Microsoft.VisualStudio.ProjectSystem.VS.Debug;
 
+
 namespace SLangPlugin
 {
     [ExportDebugger(SLangDebugger.SchemaName)]
@@ -20,10 +21,10 @@ namespace SLangPlugin
         {
         }
 
-        // TODO: Specify the assembly full name here
-        [ExportPropertyXamlRuleDefinition("SLangPlugin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9be6e469bc4921f1", "XamlRuleToCode:SLangDebugger.xaml", "Project")]
-        [AppliesTo(MyUnconfiguredProject.UniqueCapability)]
-        private object DebuggerXaml { get { throw new NotImplementedException(); } }
+        // TODO: remove due to this export is 
+        //[ExportPropertyXamlRuleDefinition("SLangPlugin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9be6e469bc4921f1", "XamlRuleToCode:SLangDebugger.xaml", "Project")]
+        //[AppliesTo(MyUnconfiguredProject.UniqueCapability)]
+        //private object DebuggerXaml { get { throw new NotImplementedException(); } }
 
         /// <summary>
         /// Gets project properties that the debugger needs to launch.
