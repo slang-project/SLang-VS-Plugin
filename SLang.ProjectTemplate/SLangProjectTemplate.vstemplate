@@ -5,13 +5,15 @@
     <Description>A template for creating a SLang project.</Description>
     <Icon>SLangProjectTemplate.ico</Icon>
     <ProjectType>SLang</ProjectType>
-    <!--<RequiredFrameworkVersion>4.5.2</RequiredFrameworkVersion>-->
     <SortOrder>1</SortOrder>
     <TemplateID>{de0aa68e-b2a8-4a34-acb4-9964b6d98b72}</TemplateID>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>SLangProjectTemplate</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <CreateInPlace>true</CreateInPlace>
+    <LanguageTag>SLang</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Console</PlatformTag>
+    <ProjectTypeTag>Desktop</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="SLangProjectTemplate.slangproj" ReplaceParameters="true">
