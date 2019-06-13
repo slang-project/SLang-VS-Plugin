@@ -14,6 +14,7 @@
     <PlatformTag>Windows</PlatformTag>
     <PlatformTag>Console</PlatformTag>
     <ProjectTypeTag>Desktop</ProjectTypeTag>
+    <CreateInPlace>true</CreateInPlace>
   </TemplateData>
   <TemplateContent>
     <Project File="SLangProjectTemplate.slangproj" ReplaceParameters="true">
@@ -22,6 +23,7 @@
       Items referenced in here must also be referenced in the project file.
       -->
       <ProjectItem OpenInEditor="true" ReplaceParameters="true">App.slang</ProjectItem>
+      <ProjectItem ReplaceParameters="true">.editorconfig</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

@@ -63,6 +63,10 @@
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
 
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\editorconfig.xaml;">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
+
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\SLangDebugger.xaml">
       <Context>Project</Context>
     </PropertyPageSchema>

@@ -1,0 +1,18 @@
+# To learn more about .editorconfig visit https://editorconfig.org/
+
+# Created on: $time$
+
+# Top-most EditorConfig file
+root = true
+
+# Configuration for all .slang files in project
+[**.slang]
+indent_style = space
+indent_size = 4
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+# NOTE (for trim_trailing_whitespace): 
+# as of Q2-2019 called only when enter is pressed
+

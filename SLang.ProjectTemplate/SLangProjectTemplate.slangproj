@@ -6,6 +6,7 @@
   <Import Project="$(CustomProjectExtensionsPath)SLangProjectType.props" />
   <ItemGroup>
     <SLangCompile Include="**\*.slang"/>
+    <EditorConfig Include=".editorconfig"/>
   </ItemGroup>
   <Import Project="$(CustomProjectExtensionsPath)SLangProjectType.targets" />
 </Project>
