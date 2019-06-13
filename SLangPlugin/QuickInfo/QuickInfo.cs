@@ -39,10 +39,26 @@ namespace SLangPlugin.QuickInfo
         private static readonly ImageId _icon2 = KnownMonikers.AbsolutePosition.ToImageId();
 
         private ITextBuffer _textBuffer;
+        SLangTokenTagger _taggerProvider;
 
         public SLangQuickInfoSource(ITextBuffer textBuffer)
         {
             _textBuffer = textBuffer;
+            _taggerProvider = new SLangTokenTagProvider().CreateTagger<SLangTokenTag>(textBuffer) as SLangTokenTagger;
+        }
+
+        private string extractType(int line, int pos)
+        {
+            foreach (var tag in _taggerProvider._lastTags)
+            {
+                SLang.Span span = tag.Tag.token.span;
+                if (line +1 >= span.begin.line && line+1 <= span.end.line && pos+1 >= span.begin.pos && pos+1 <= span.end.pos)
+                {
+                    string name = tag.Tag.token.category.ToString();
+                    return name;
+                }
+            }
+            return "";
         }
 
         // This is called on a background thread.
@@ -55,7 +71,8 @@ namespace SLangPlugin.QuickInfo
                 var line = triggerPoint.Value.GetContainingLine();
                 var lineNumber = triggerPoint.Value.GetContainingLine().LineNumber;
                 var lineOffset = triggerPoint.Value.Position - line.Start.Position;
-                
+
+                string type = extractType(lineNumber, lineOffset);
 
                 var lineSpan = _textBuffer.CurrentSnapshot.CreateTrackingSpan(line.Extent, SpanTrackingMode.EdgeInclusive);
 
@@ -74,10 +91,18 @@ namespace SLangPlugin.QuickInfo
                         new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, $"{lineOffset + 1}")
                     ));
 
+                var typeElm = new ContainerElement(
+                    ContainerElementStyle.Wrapped,
+                    new ClassifiedTextElement(
+                        new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "Type: "),
+                        new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, type)
+                    ));
+
                 var resultElm = new ContainerElement(
                     ContainerElementStyle.Stacked,
                     lineNumberElm,
-                    linePosElm
+                    linePosElm,
+                    typeElm
                 );
 
                 return Task.FromResult(new QuickInfoItem(lineSpan, resultElm));
