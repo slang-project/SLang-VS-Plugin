@@ -6,13 +6,13 @@ Target version is Visual Studio 2019.
 
 #### Essential Features:
 - [ ] **Code Highlight (Tagger)**
-    - [x] Basic support
-    - [ ] Interface with parser
-- [ ] **Project management**
+    - [x] Lexer-based
+    - [ ] Semantic additions (semantic api)
+- [x] **Project management**
     - [x] Create project file (\*.slangproj)
-    - [ ] Templates (Empty project, Basic Command Line app)
-    - [ ] Build with compiler (output paths, debug/release modes)
-    - [ ] Settings (compiler path, startup/other file)
+    - [x] Templates (Empty project, Basic Command Line app)
+    - [x] Build with compiler (output paths, debug/release modes)
+    - [x] Settings (compiler path, startup/other file)
 - [ ] **IntelliSense (define api, write stubs)**
     - [x] Quick Info (semantic api)
     - [x] Error indication (semantic api)

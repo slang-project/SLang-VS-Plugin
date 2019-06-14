@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Copyright, Microsoft Corporation, All rights reserved.-->
+        
+<!--TODO: Update the following files with the specified content
+
+    *BuildSystem\DeployedBuildSystem\CustomProject.props* - update the value of the existing DebuggerFlavor element to use the new debugger
+    <PropertyGroup>
+      <DebuggerFlavor>SLangDebugger</DebuggerFlavor>
+    </PropertyGroup>
+-->
+<Rule
+	Name="SLangDebugger"
+	DisplayName="SLang Debugger"
+	PageTemplate="debugger"
+	Description="SLang Debugger options"
+	xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.DataSource>
+        <DataSource Persistence="UserFileWithXamlDefaults" HasConfigurationCondition="True"/>
+    </Rule.DataSource>
+
+    <StringProperty Name="BuildCommand" DisplayName="Build Command"
+                Default="C:/DummyDebugger/ArgPrinter.exe"
+                Description="The debug command to execute.">
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="DefaultFindFullPathPropertyEditor" DisplayName="&lt;ArgPrinter.exe&gt;">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Exename" Value="ArgPrinter.exe" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+            <ValueEditor EditorType="DefaultStringPropertyEditor" DisplayName="&lt;Edit...&gt;"/>
+            <ValueEditor EditorType="DefaultFilePropertyEditor" DisplayName="&lt;Browse...&gt;">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Filters" Value="Executables (*.exe)|*.exe" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+    </StringProperty>
+
+    <StringProperty Name="BuildCommandArguments" DisplayName="Build Command Arguments"
+                Description="The command line arguments to pass to the compiler.">
+        <Argument Property="BuildCommand" />
+    </StringProperty>
+    <StringProperty Name="BuildCommandWorkingDirectory" DisplayName="Working Directory"
+                Default="$(MSBuildProjectDirectory)"  
+                Description="The application's working directory. By default, the directory containing the project file."
+                Subtype="folder"/>
+
+    <StringProperty Name="RunCommand" DisplayName="Run Command"
+                Default="C:/DummyDebugger/ArgPrinter.exe"
+                Description="The debug command to execute.">
+        <StringProperty.ValueEditors>
+            <ValueEditor EditorType="DefaultFindFullPathPropertyEditor" DisplayName="&lt;ArgPrinter.exe&gt;">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Exename" Value="ArgPrinter.exe" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+            <ValueEditor EditorType="DefaultStringPropertyEditor" DisplayName="&lt;Edit...&gt;"/>
+            <ValueEditor EditorType="DefaultFilePropertyEditor" DisplayName="&lt;Browse...&gt;">
+                <ValueEditor.Metadata>
+                    <NameValuePair Name="Filters" Value="Executables (*.exe)|*.exe" />
+                </ValueEditor.Metadata>
+            </ValueEditor>
+        </StringProperty.ValueEditors>
+    </StringProperty>
+
+    <StringProperty Name="RunCommandArguments" DisplayName="Run Command Arguments"
+                Description="The command line arguments to pass to the application.">
+        <Argument Property="SLangDebuggerCommand" />
+    </StringProperty>
+    <StringProperty Name="SLangDebuggerWorkingDirectory" DisplayName="Working Directory"
+                Default="$(MSBuildProjectDirectory)"  
+                Description="The application's working directory. By default, the directory containing the project file."
+                Subtype="folder"/>
+    <!--<BoolProperty Name="Debugger1DebuggerAttach" DisplayName="Attach"
+                Default="False"
+                Description="Specifies whether the debugger should attempt to attach to an existing process when debugging starts." />-->
+</Rule>

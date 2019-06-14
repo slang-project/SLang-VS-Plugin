@@ -24,13 +24,32 @@ namespace SLangPlugin
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(SLangPluginPackage.PackageGuidString)]
+    [Guid(SLangPluginPackage.PackageGuid)]
     public sealed class SLangPluginPackage : AsyncPackage
     {
         /// <summary>
         /// SLangPluginPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "8b350b14-28f0-409a-85db-14bb223e017a";
+        //public const string PackageGuidString = "8b350b14-28f0-409a-85db-14bb223e017a";
+        public const string PackageGuid = "dd0c6986-b7af-41a5-b18b-782f46147f17";
+
+
+        /// <summary>
+        /// The GUID for this project type.  It is unique with the project file extension and
+        /// appears under the VS registry hive's Projects key.
+        /// </summary>
+        public const string ProjectTypeGuid = "df463880-e097-4aa5-860f-4d14c15adffc";
+
+        /// <summary>
+        /// The file extension of this project type.  No preceding period.
+        /// </summary>
+        public const string ProjectExtension = "slangproj";
+
+        /// <summary>
+        /// The default namespace this project compiles with, so that manifest
+        /// resource names can be calculated for embedded resources.
+        /// </summary>
+        internal const string DefaultNamespace = "SLangPlugin";
 
         #region Package Members
 
