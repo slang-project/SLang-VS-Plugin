@@ -44,8 +44,10 @@ namespace SLangPlugin.CodeNavigation
                     switch (prgCmds[0].cmdID)
                     {
                         case (uint)VSConstants.VSStd97CmdID.GotoDefn: // F12
-                        case (uint)VSConstants.VSStd97CmdID.Start:    // F5
-                        case (uint)VSConstants.VSStd97CmdID.StepInto: // F11
+                        case (uint)VSConstants.VSStd97CmdID.FindReferences:
+                        case (uint)VSConstants.VSStd97CmdID.F1Help:
+                            //case (uint)VSConstants.VSStd97CmdID.Start:    // F5
+                            //case (uint)VSConstants.VSStd97CmdID.StepInto: // F11
                             prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED;
                             prgCmds[0].cmdf |= (uint)OLECMDF.OLECMDF_ENABLED;
                             return VSConstants.S_OK;
@@ -59,35 +61,36 @@ namespace SLangPlugin.CodeNavigation
         {
             if (pguidCmdGroup == typeof(VSConstants.VSStd97CmdID).GUID)
             {
+                SnapshotPoint caretPoint = m_textView.Caret.Position.BufferPosition;
+                var containingLine = caretPoint.GetContainingLine();
+                int lineNumber = containingLine.LineNumber;
+                int lineOffset = caretPoint.Position - containingLine.Start;
+
                 switch (nCmdID)
                 {
-                    //case (uint)VSConstants.VSStd97CmdID.Start:    // F5
-                    //    if (DafnyClassifier.DafnyMenuPackage.MenuProxy.StopVerifierCommandEnabled(m_textView))
-                    //    {
-                    //        DafnyClassifier.DafnyMenuPackage.MenuProxy.StopVerifier(m_textView);
-                    //    }
-                    //    else
-                    //    {
-                    //        DafnyClassifier.DafnyMenuPackage.MenuProxy.RunVerifier(m_textView);
-                    //    }
-                    //    return VSConstants.S_OK;
-                    //case (uint)VSConstants.VSStd97CmdID.StepInto:
-                    //    if (DafnyClassifier.DafnyMenuPackage.MenuProxy.StopResolverCommandEnabled(m_textView))
-                    //    {
-                    //        DafnyClassifier.DafnyMenuPackage.MenuProxy.StopResolver(m_textView);
-                    //    }
-                    //    else
-                    //    {
-                    //        DafnyClassifier.DafnyMenuPackage.MenuProxy.RunResolver(m_textView);
-                    //    }
-                    //    return VSConstants.S_OK;
+                    case (uint)VSConstants.VSStd97CmdID.FindReferences:
+                        VsShellUtilities.ShowMessageBox(
+                            _serviceProvider,
+                            $"Find from symbol at line: {lineNumber}, offset:{lineOffset}",
+                            nameof(KeyBindingCommandFilter),
+                            OLEMSGICON.OLEMSGICON_INFO,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                        // check https://github.com/Microsoft/PTVS/blob/master/Python/Product/PythonTools/PythonTools/Navigation/EditFilter.cs
+                        return VSConstants.S_OK;
+
+                    case (uint)VSConstants.VSStd97CmdID.F1Help:
+                        //VsShellUtilities.ShowMessageBox(
+                        //    _serviceProvider,
+                        //    $"F1Help from symbol at line: {lineNumber}, offset:{lineOffset}",
+                        //    nameof(KeyBindingCommandFilter),
+                        //    OLEMSGICON.OLEMSGICON_INFO,
+                        //    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                        //    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                        System.Diagnostics.Process.Start("https://github.com/slang-project/SLang");
+                        return VSConstants.S_OK;
+
                     case (uint)VSConstants.VSStd97CmdID.GotoDefn: // F12
-
-                        SnapshotPoint caretPoint = m_textView.Caret.Position.BufferPosition;
-                        var containingLine = caretPoint.GetContainingLine();
-                        int lineNumber = containingLine.LineNumber;
-                        int lineOffset = caretPoint.Position - containingLine.Start;
-
                         VsShellUtilities.ShowMessageBox(
                             _serviceProvider,
                             $"GoToDefinition from symbol at line: {lineNumber}, offset:{lineOffset}",
@@ -95,7 +98,6 @@ namespace SLangPlugin.CodeNavigation
                             OLEMSGICON.OLEMSGICON_INFO,
                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
                             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                        //DafnyClassifier.DafnyMenuPackage.MenuProxy.GoToDefinition(m_textView);
                         return VSConstants.S_OK;
                 }
             }
