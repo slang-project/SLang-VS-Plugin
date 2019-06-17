@@ -49,6 +49,7 @@
     <Compile Include="Classification\ClassificationMapping.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
+    <Compile Include="CodeNavigation\KeyBindingFilter.cs" />
     <Compile Include="customIconsMonikers.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
