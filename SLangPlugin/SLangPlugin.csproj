@@ -49,7 +49,7 @@
     <Compile Include="Classification\ClassificationMapping.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
-    <Compile Include="CodeNavigation\KeyBindingFilter.cs" />
+    <Compile Include="Commands\KeyBindingFilter.cs" />
     <Compile Include="customIconsMonikers.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
@@ -59,13 +59,14 @@
     <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="SLangTokenType.cs" />
-    <Compile Include="Commands\CommandBindings.cs" />
-    <Compile Include="Commands\CommentSelectedCommand.cs" />
+    <Compile Include="Comment\CommandBindings.cs" />
+    <Compile Include="Comment\CommentSelectedCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ErrorDetection\SquigglesTagger.cs" />
     <Compile Include="Outliner\OutliningTagger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SLangPluginPackage.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildSystem\DeployedBuildSystem\SLangProjectType.props" />

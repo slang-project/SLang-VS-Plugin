@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.Utilities;
 
 // Based on https://github.com/madskristensen/TextmateBundleInstaller
 
-namespace SLangPlugin.Commands
+namespace SLangPlugin.Comment
 {
     [Export(typeof(ICommandHandler))]
     [Name(nameof(CommentUncommentCommand))]
