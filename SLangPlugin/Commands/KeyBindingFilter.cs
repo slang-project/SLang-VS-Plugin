@@ -27,11 +27,13 @@ namespace SLangPlugin.Commands
 
         //[Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))]
         internal System.IServiceProvider _serviceProvider = null;
+        GoToDefinitionCommandHandler _goToDefinitionCommandHandler;
 
         public KeyBindingCommandFilter(IWpfTextView textView, System.IServiceProvider serviceProvider)
         {
             m_textView = textView;
             _serviceProvider = serviceProvider;
+            _goToDefinitionCommandHandler = new GoToDefinitionCommandHandler(_serviceProvider, m_textView);
         }
 
         public void showInfoMessage(string message)
@@ -100,6 +102,9 @@ namespace SLangPlugin.Commands
             int lineNumber = containingLine.LineNumber;
             int lineOffset = caretPoint.Position - containingLine.Start;
 
+            ITextDocument textDocument = Utilities.GetTextDocument(m_textView.TextBuffer);
+            string filename = (textDocument != null) ? textDocument.FilePath : ""; //TODO: optimize - move to constructor
+
             if (pguidCmdGroup == typeof(VSConstants.VSStd97CmdID).GUID)
             {
                 switch (nCmdID)
@@ -116,6 +121,7 @@ namespace SLangPlugin.Commands
 
                     case (uint)VSConstants.VSStd97CmdID.GotoDefn:
                         showInfoMessage($"GoToDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        _goToDefinitionCommandHandler.NavigateTo("C:\\Users\\Maksim Surkov\\source\\repos\\SLangProjectTemplate14\\App.slang", 1, 1); // TODO: replace with actual search call
                         return VSConstants.S_OK;
                 }
             }
@@ -133,8 +139,6 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd2KCmdID.FORMATDOCUMENT:
-                        ITextDocument textDocument = Utilities.GetTextDocument(m_textView.TextBuffer);
-                        string filename = (textDocument != null)?textDocument.FilePath:"";
                         showInfoMessage($"FormatDocument for {filename}");
                         return VSConstants.S_OK;
                     case (uint)VSConstants.VSStd2KCmdID.FORMATSELECTION:
