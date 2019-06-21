@@ -81,7 +81,7 @@ namespace SLangPlugin
             while (token.code != SLang.TokenCode.EOS)
             {
                 SLangTokenTag currentTag = new SLangTokenTag(token);
-                if (currentTag.type != SLangTokenType.Ignore)
+                if (currentTag.type != SLangTokenType.Whitespace)
                 {
                     Span currentTokenSpan = ConvertToSpan(token.span, _snapshot);
                     SnapshotSpan tokenSpan = new SnapshotSpan(_snapshot, currentTokenSpan);
@@ -119,7 +119,8 @@ namespace SLangPlugin
 
             int begin = containingSnapshot.GetLineFromLineNumber(beginLine).Start + beginPos;
             int containingSpanshotEnd = containingSnapshot.GetLineFromLineNumber(containingSnapshot.LineCount - 1).End;
-            int end = Math.Min(containingSnapshot.GetLineFromLineNumber(endLine).Start + endPos, containingSpanshotEnd);
+            int proposedLastLine = Math.Min(endLine, containingSnapshot.LineCount - 1);
+            int end = Math.Min(containingSnapshot.GetLineFromLineNumber(proposedLastLine).Start + endPos, containingSpanshotEnd);
             int length = end - begin;
             return new Span(begin - 1, length);
         }
