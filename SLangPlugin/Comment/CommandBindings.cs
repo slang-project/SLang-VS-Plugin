@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.VisualStudio.VSConstants;
 
-namespace SLangPlugin.Commands
+namespace SLangPlugin.Comment
 {
     internal sealed class CommandBindings
     {

@@ -21,13 +21,12 @@ Target version is Visual Studio 2019.
     - [ ] Complete Word (semantic api)
     - [ ] Lightbulb suggestions (semantic api)
 - [ ] **Context Menu Commands**
-    - [ ] Go to definition (semantic api)
+    - [x] Go to definition (semantic api)
     - [ ] Peek definition (create wpf window view?)(semantic api)
     - [ ] Find all references (semantic api)
 - [x] **Code folding (Outlining) + (needs to be moved to AST interface)**
-- [ ] `.editorconfig` **features**
-    - [ ] explicit integration into project
-    - [ ] hidden integration
+- [x] `.editorconfig` **features**
+    - [x] explicit integration into project
 - [x] **Comment/uncomment commands + (multi-line/doc comment in future)**
 - [ ] **Brace matching in expressions**
     - [ ] variadic colorization
@@ -44,6 +43,7 @@ Target version is Visual Studio 2019.
     - breakpoints
     - variable watches
 - Navigation Bars (function/etc navigation dropdown on top of editor)
+- Solution Explorer Search
 - Snippets
 ---
 
