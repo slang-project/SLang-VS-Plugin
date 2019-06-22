@@ -107,7 +107,8 @@ namespace SLangPlugin.Adornments
             {
                 new Tuple<SLang.TokenCode, SLang.TokenCode>(SLang.TokenCode.LParen, SLang.TokenCode.RParen),
                 new Tuple<SLang.TokenCode, SLang.TokenCode>(SLang.TokenCode.LBracket, SLang.TokenCode.RBracket),
-                new Tuple<SLang.TokenCode, SLang.TokenCode>(SLang.TokenCode.Is, SLang.TokenCode.End)
+                new Tuple<SLang.TokenCode, SLang.TokenCode>(SLang.TokenCode.Is, SLang.TokenCode.End),
+                new Tuple<SLang.TokenCode, SLang.TokenCode>(SLang.TokenCode.Loop, SLang.TokenCode.End)
             };
 
         private ITagSpan<SLangTokenTag> findLeftMatch(SLang.TokenCode rightType, SLang.TokenCode leftType, int rightLocation,
@@ -134,6 +135,21 @@ namespace SLangPlugin.Adornments
             return null;
         }
 
+        bool isIn (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag)
+        {
+            return caretPos.BufferPosition >= tag.Span.Start && caretPos.BufferPosition <= tag.Span.End;
+        }
+
+        bool isInExcludeLeft (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag)
+        {
+            return caretPos.BufferPosition > tag.Span.Start && caretPos.BufferPosition <= tag.Span.End;
+        }
+
+        bool isInExcludeRight (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag)
+        {
+            return caretPos.BufferPosition >= tag.Span.Start && caretPos.BufferPosition < tag.Span.End;
+        }
+
         void UpdateAtCaretPosition(CaretPosition caretPosition)
         {
             _lastHighlights.Clear();
@@ -142,10 +158,7 @@ namespace SLangPlugin.Adornments
 
             bool exitLoop = false;
 
-            Func<CaretPosition, ITagSpan<SLangTokenTag>, bool> isIn = delegate (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag) { return caretPos.BufferPosition >= tag.Span.Start && caretPos.BufferPosition <= tag.Span.End; };
-            Func<CaretPosition, ITagSpan<SLangTokenTag>, bool> isInExcludeLeft = delegate (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag) { return caretPos.BufferPosition > tag.Span.Start && caretPos.BufferPosition <= tag.Span.End; };
-            Func<CaretPosition, ITagSpan<SLangTokenTag>, bool> isInExcludeRight = delegate (CaretPosition caretPos, ITagSpan<SLangTokenTag> tag) { return caretPos.BufferPosition >= tag.Span.Start && caretPos.BufferPosition < tag.Span.End; };
-
+            
             for (int i=0; i < _lastTags.Count; ++i)
             {
                 ITagSpan<SLangTokenTag> tag = _lastTags[i];
