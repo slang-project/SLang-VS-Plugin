@@ -52,6 +52,10 @@
     <Compile Include="Classification\SLangClassifier.cs" />
     <Compile Include="Commands\GoToDefinitionCommandHandler.cs" />
     <Compile Include="Commands\KeyBindingFilter.cs" />
+    <Compile Include="Completion\CompletionCommitManager.cs" />
+    <Compile Include="Completion\CompletionSource.cs" />
+    <Compile Include="Completion\DefaultCompletionItemManager.cs" />
+    <Compile Include="Completion\ElementCatalog.cs" />
     <Compile Include="customIconsMonikers.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
