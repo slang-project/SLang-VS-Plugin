@@ -114,8 +114,10 @@ namespace SLangPlugin.Classification
 
             _snapshot = _buffer.CurrentSnapshot;
 
-            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
-                _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
+            //TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
+            //    _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
+            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot, 0,
+                    _snapshot.Length)));
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;

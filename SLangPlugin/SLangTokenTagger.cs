@@ -95,14 +95,6 @@ namespace SLangPlugin
         {
             if (spans.Count > 0)
             {
-                //var snap = spans[0].Snapshot;
-                //if (snap != _snapshot)
-                //{
-                //    _snapshot = snap;
-                //    PerformReTag();
-                //    TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End)));
-                //}
-
                 foreach (var tagSpan in _lastTags ?? Enumerable.Empty<ITagSpan<SLangTokenTag>>())
                 {
                     yield return tagSpan;
@@ -114,15 +106,16 @@ namespace SLangPlugin
         {
             int beginLine = span.begin.line - 1,
                 endLine = span.end.line - 1,
-                beginPos = span.begin.pos - 1,
-                endPos = span.end.pos - 1;
+                beginPos = span.begin.pos - 2,
+                endPos = span.end.pos - 2;
 
             int begin = containingSnapshot.GetLineFromLineNumber(beginLine).Start + beginPos;
             int containingSpanshotEnd = containingSnapshot.GetLineFromLineNumber(containingSnapshot.LineCount - 1).End;
             int proposedLastLine = Math.Min(endLine, containingSnapshot.LineCount - 1);
-            int end = Math.Min(containingSnapshot.GetLineFromLineNumber(proposedLastLine).Start + endPos, containingSpanshotEnd);
+            int proposedLastLineStart = containingSnapshot.GetLineFromLineNumber(proposedLastLine).Start;
+            int end = Math.Min(proposedLastLineStart + endPos, containingSpanshotEnd);
             int length = end - begin;
-            return new Span(begin - 1, length);
+            return new Span(begin, length);
         }
     }
     #endregion

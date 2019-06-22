@@ -33,9 +33,6 @@ namespace SLangPlugin.Outliner
         [Import]
         internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
 
-        //[Import]
-        IProjectionEditResolver projectionEditResolver = null;
-
         [Import]
         IContentTypeRegistryService contentTypeRegistryService = null;
 
