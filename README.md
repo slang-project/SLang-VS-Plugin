@@ -4,6 +4,8 @@
 Add support for SLang Programming Language into Visual Studio IDE.
 Target version is Visual Studio 2019.
 
+Up-to-date development progress can be tracked via ["Essential Features" github project](https://github.com/slang-project/SLang-VS-Plugin/projects/1)
+
 #### Implemented Features:
 - [ ] **Code Highlight (Tagger)**
     - [x] Lexer-based

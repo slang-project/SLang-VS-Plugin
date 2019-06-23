@@ -20,8 +20,7 @@ namespace SLangPlugin.Completion
 {
     #region Source Provider
     [Export(typeof(IAsyncCompletionSourceProvider))]
-    [Name("Chemical element dictionary completion provider")]
-    [ContentType("text")]
+    [ContentType(Constants.ContentType)]
     class SampleCompletionSourceProvider : IAsyncCompletionSourceProvider
     {
         IDictionary<ITextView, IAsyncCompletionSource> cache = new Dictionary<ITextView, IAsyncCompletionSource>();
@@ -62,7 +61,7 @@ namespace SLangPlugin.Completion
         static CompletionFilter MetalFilter = new CompletionFilter("Metal", "M", MetalIcon);
         static CompletionFilter NonMetalFilter = new CompletionFilter("Non metal", "N", NonMetalIcon);
         static CompletionFilter UnknownFilter = new CompletionFilter("Unknown", "U", UnknownIcon);
-
+        
         // CompletionItem takes array of CompletionFilters.
         // In this example, items assigned "MetalloidFilters" are visible in the list if user selects either MetalFilter or NonMetalFilter.
         static ImmutableArray<CompletionFilter> MetalFilters = ImmutableArray.Create(MetalFilter);

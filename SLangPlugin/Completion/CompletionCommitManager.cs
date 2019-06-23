@@ -16,8 +16,7 @@ namespace SLangPlugin.Completion
 {
     #region Manager Provider
     [Export(typeof(IAsyncCompletionCommitManagerProvider))]
-    [Name("Chemical element commit manager provider")]
-    [ContentType("text")]
+    [ContentType(Constants.ContentType)]
     class SampleCompletionCommitManagerProvider : IAsyncCompletionCommitManagerProvider
     {
         IDictionary<ITextView, IAsyncCompletionCommitManager> cache = new Dictionary<ITextView, IAsyncCompletionCommitManager>();

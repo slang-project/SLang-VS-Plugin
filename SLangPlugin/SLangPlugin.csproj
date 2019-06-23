@@ -54,7 +54,6 @@
     <Compile Include="Commands\KeyBindingFilter.cs" />
     <Compile Include="Completion\CompletionCommitManager.cs" />
     <Compile Include="Completion\CompletionSource.cs" />
-    <Compile Include="Completion\DefaultCompletionItemManager.cs" />
     <Compile Include="Completion\ElementCatalog.cs" />
     <Compile Include="customIconsMonikers.cs" />
     <Compile Include="MyConfiguredProject.cs" />
