@@ -39,6 +39,7 @@ namespace SLangPlugin.Outliner
         [Import]
         IContentTypeRegistryService contentTypeRegistryService = null;
 
+
         // Create a single tagger for each buffer.
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
@@ -58,7 +59,9 @@ namespace SLangPlugin.Outliner
     {
 
         string ellipsis = "...";    //the characters that are displayed when the region is collapsed
-        string hoverText = "Unwrap block"; //the contents of the tooltip for the collapsed span
+        const int MaxPreviewSize = 1000;
+        const double PreviewWindowZoomFactor = 1.0;
+
         ITextBuffer _buffer;
         ITextSnapshot _snapshot;
         ITextEditorFactoryService _textEditorFactoryService;
@@ -85,11 +88,8 @@ namespace SLangPlugin.Outliner
             _contentTypeRegistryService = contentTypeRegistryService;
             _aggregator = SLangTagAggregator;
 
-            var generalTagger = buffer.Properties.GetOrCreateSingletonProperty<ITagger<SLangTokenTag>>(
-                creator: () => new SLangTokenTagger(buffer) as ITagger<SLangTokenTag>);
-
-            SLangTokenTagger SLangTokenTagger = generalTagger as SLangTokenTagger;
-            _outlineTokens = SLangTokenTagger._lastTags;
+            SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(_buffer) as SLangTokenTagger;
+            _outlineTokens = generalTagger._lastTags;
             _regions = new List<Region>();
             CreateOutlineRegions();
             _buffer.Changed += BufferChanged;
@@ -138,11 +138,8 @@ namespace SLangPlugin.Outliner
             IWpfTextView view = textEditorFactoryService.CreateTextView(finalBuffer, roles);
 
             view.Background = Brushes.Transparent;
-
             view = SizeToFit(view);
-
-            // Zoom out a bit to shrink the text.
-            view.ZoomLevel *= 0.75;
+            view.ZoomLevel *= PreviewWindowZoomFactor;
 
             return view;
         }
@@ -154,7 +151,7 @@ namespace SLangPlugin.Outliner
 
             // Trim the length if it's too long.
             var shortSpan = span;
-            if (span.Length > 1000/*MaxPreviewText*/)
+            if (span.Length > MaxPreviewSize)
             {
                 shortSpan = ComputeShortSpan(span, subjectBuffer);
             }
@@ -176,8 +173,6 @@ namespace SLangPlugin.Outliner
 
         public static SnapshotSpan GetFullSpan(ITextSnapshot snapshot)
         {
-            //Contract.ThrowIfNull(snapshot);
-
             return new SnapshotSpan(snapshot, new Span(0, snapshot.Length));
         }
 
@@ -204,7 +199,7 @@ namespace SLangPlugin.Outliner
 
         private Span ComputeShortSpan(Span span, ITextBuffer subjectBuffer)
         {
-            var endIndex = span.Start + 1000/*MaxPreviewText*/;
+            var endIndex = span.Start + MaxPreviewSize;
             var line = subjectBuffer.CurrentSnapshot.GetLineFromPosition(endIndex);
 
             return Span.FromBounds(span.Start, line.EndIncludingLineBreak);
@@ -228,7 +223,6 @@ namespace SLangPlugin.Outliner
                 exposedSpans: new NormalizedSnapshotSpanCollection(dataBuffer.CurrentSnapshot, shortHintSpan),
                 options: ElisionBufferOptions.None);
         }
-        int a(){ return 0; }
         public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (spans.Count == 0)
@@ -271,24 +265,6 @@ namespace SLangPlugin.Outliner
 
             _snapshot = _buffer.CurrentSnapshot;
             CreateOutlineRegions();
-        }
-
-        // Step #9: Add a method that parses the buffer. The example given here is for illustration only. 
-        // It synchronously parses the buffer into nested outlining regions.
-
-        int MinIndexOfSeveral(string space, IList<string> tags, StringComparison comparator)
-        {
-            int min = -1;
-            foreach (var tag in tags)
-            {
-                var curr = space.IndexOf(tag, comparator);
-                if (curr >= 0 && curr < min)
-                    min = curr; // select minimum non-negative index
-                else if (min < 0 && curr >= 0)
-                    min = curr;
-
-            }
-            return min;
         }
 
         void CreateOutlineRegions()

@@ -16,6 +16,7 @@ namespace SLangPlugin.Completion
 {
     #region Manager Provider
     [Export(typeof(IAsyncCompletionCommitManagerProvider))]
+    [Name("SLang Completion commit manager provider")]
     [ContentType(Constants.ContentType)]
     class SampleCompletionCommitManagerProvider : IAsyncCompletionCommitManagerProvider
     {
@@ -50,6 +51,13 @@ namespace SLangPlugin.Completion
 
         public bool ShouldCommitCompletion(IAsyncCompletionSession session, SnapshotPoint location, char typedChar, CancellationToken token)
         {
+            if (typedChar == ' ')
+            {
+                session.Dismiss();
+                return false;
+                
+            }
+
             // This method runs synchronously, potentially before CompletionItem has been computed.
             // The purpose of this method is to filter out characters not applicable at given location.
 

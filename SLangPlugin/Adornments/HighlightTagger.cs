@@ -44,14 +44,9 @@ namespace SLangPlugin.Adornments
         {
             _textView = textView;
             _textBuffer = textBuffer;
-
-            // get tags list that operates with lexer
-            var generalTagger = _textBuffer.Properties.GetOrCreateSingletonProperty<ITagger<SLangTokenTag>>(
-                creator: () => new SLangTokenTagger(_textBuffer) as ITagger<SLangTokenTag>);
-
-            // assign tags list that will be updated by tagger
-            SLangTokenTagger SLangTokenTagger = generalTagger as SLangTokenTagger;
-            _lastTags = SLangTokenTagger._lastTags;
+            
+            SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(_textBuffer) as SLangTokenTagger;
+            _lastTags = generalTagger._lastTags;
             
             // initialize empty highlights list
             _lastHighlights = new List<ITagSpan<TextMarkerTag>>();
