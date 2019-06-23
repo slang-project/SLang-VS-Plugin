@@ -4,25 +4,28 @@
 Add support for SLang Programming Language into Visual Studio IDE.
 Target version is Visual Studio 2019.
 
+Up-to-date development progress can be tracked via ["Essential Features" github project](https://github.com/slang-project/SLang-VS-Plugin/projects/1)
+
 #### Implemented Features:
 - [ ] **Code Highlight (Tagger)**
     - [x] Lexer-based
-    - [ ] Semantic additions (semantic api)
+- [ ] **Symbol Resolver**
+    - [ ] Resolver Tagger
 - [x] **Project management**
     - [x] Create project file (\*.slangproj)
     - [x] Templates (Empty project, Basic Command Line app)
     - [x] Build with compiler (output paths, debug/release modes)
     - [x] Settings (compiler path, startup/other file)
 - [ ] **IntelliSense (define api, write stubs)**
-    - [x] Quick Info (semantic api)
+    - [x] Quick Info (file context)
     - [x] Error indication (interface only)
-    - [ ] List Members (Plain file context)
+    - [x] List Members (plain file context)
 - [x] **Code Navigation**
-    - [x] Go to definition (semantic api)
+    - [x] Go to definition (file context)
 - [x] **Code folding (Outlining) + (needs to be moved to AST interface)**
 - [x] `.editorconfig`
     - [x] explicit integration into project
-- [x] **Comment/uncomment commands + (multi-line/doc comment in future)**
+- [x] **Comment/uncomment commands**
 - [x] **Brace matching in expressions**
 - [x] **Occurance matching (Plain file context)**
 - [ ] **Smart/Auto Indent**

@@ -39,17 +39,17 @@ namespace SLangPlugin.QuickInfo
         private static readonly ImageId _icon2 = KnownMonikers.AbsolutePosition.ToImageId();
 
         private ITextBuffer _textBuffer;
-        SLangTokenTagger _taggerProvider;
+        SLangTokenTagger _tagger;
 
         public SLangQuickInfoSource(ITextBuffer textBuffer)
         {
             _textBuffer = textBuffer;
-            _taggerProvider = new SLangTokenTagProvider().CreateTagger<SLangTokenTag>(textBuffer) as SLangTokenTagger;
+            _tagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(textBuffer) as SLangTokenTagger;
         }
 
         private string extractType(int line, int pos)
         {
-            foreach (var tag in _taggerProvider._lastTags)
+            foreach (var tag in _tagger._lastTags)
             {
                 SLang.Span span = tag.Tag.token.span;
                 if (line +1 >= span.begin.line && line+1 <= span.end.line && pos+1 >= span.begin.pos && pos+1 <= span.end.pos)

@@ -110,7 +110,7 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd97CmdID.FindReferences:
-                        showInfoMessage($"FindAllReferences from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        showInfoMessage($"Not Implemented Yet.\nFindAllReferences from symbol at line: {lineNumber}, offset:{lineOffset}");
                         // To consider https://github.com/Microsoft/PTVS/blob/master/Python/Product/PythonTools/PythonTools/Navigation/EditFilter.cs
                         return VSConstants.S_OK;
 
@@ -130,7 +130,7 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd12CmdID.PeekDefinition:
-                        showInfoMessage($"PeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        showInfoMessage($"Not Implemented Yet.\nPeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
                         return VSConstants.S_OK;
                 }
             }
@@ -139,7 +139,7 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd2KCmdID.FORMATDOCUMENT:
-                        showInfoMessage($"FormatDocument for {filename}");
+                        showInfoMessage($"Not Implemented Yet.\nFormatDocument for {filename}");
                         return VSConstants.S_OK;
                     case (uint)VSConstants.VSStd2KCmdID.FORMATSELECTION:
                         ITextSelection selection = m_textView.Selection;
@@ -153,7 +153,7 @@ namespace SLangPlugin.Commands
                             int selectionEndLineNumber = selectionEndContainingLine.LineNumber;
                             int selectionEndLineOffset = selection.End.Position.Position - selectionEndContainingLine.Start;
 
-                            showInfoMessage($"FormatSelection from (line: {selectionStartLineNumber}, offset:{selectionStartLineOffset}) to (line: {selectionEndLineNumber}, offset:{selectionEndLineOffset})");
+                            showInfoMessage($"Not Implemented Yet.\nFormatSelection from (line: {selectionStartLineNumber}, offset:{selectionStartLineOffset}) to (line: {selectionEndLineNumber}, offset:{selectionEndLineOffset})");
                             return VSConstants.S_OK;
                         }
                         else

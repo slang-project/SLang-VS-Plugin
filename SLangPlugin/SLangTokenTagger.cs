@@ -28,9 +28,9 @@ namespace SLangPlugin
     #region Tagger Provider
 
     [Export(typeof(ITaggerProvider))]
-    [ContentType("SLang")]
+    [ContentType(Constants.ContentType)]
     [TagType(typeof(SLangTokenTag))]
-    internal sealed class SLangTokenTagProvider : ITaggerProvider
+    internal sealed class SLangTokenTaggerProvider : ITaggerProvider
     {
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
