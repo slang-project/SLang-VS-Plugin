@@ -17,19 +17,19 @@ namespace SLangPlugin.Classification
     #region Tagger Provider
 
     [Export(typeof(ITaggerProvider))]
-    [ContentType("SLang")]
+    [ContentType(Constants.ContentType)]
     [TagType(typeof(ClassificationTag))]
     internal sealed class SLangClassifierProvider : ITaggerProvider
     {
 
         [Export]
-        [Name("SLang")]
+        [Name(Constants.ContentType)]
         [BaseDefinition("code")]
         internal static ContentTypeDefinition SLangContentType = null;
 
         [Export]
         [FileExtension(".slang")]
-        [ContentType("SLang")]
+        [ContentType(Constants.ContentType)]
         internal static FileExtensionToContentTypeDefinition SLangFileType = null;
 
         [Import]
@@ -114,8 +114,8 @@ namespace SLangPlugin.Classification
 
             _snapshot = _buffer.CurrentSnapshot;
 
-            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
-                _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
+            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot, 0,
+                    _snapshot.Length)));
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;

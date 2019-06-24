@@ -51,12 +51,13 @@ namespace SLangPlugin.ErrorDetection
         {
             foreach (IMappingTagSpan<SLangTokenTag> myTokenTag in this._aggregator.GetTags(spans))
             {
-                if (myTokenTag.Tag.type == SLangTokenType.NumericLiteral)
-                {
-                    SnapshotSpan tagSpan = myTokenTag.Span.GetSpans(_sourceBuffer)[0];
-                    yield return new TagSpan<IErrorTag>(tagSpan, new ErrorTag(PredefinedErrorTypeNames.SyntaxError, "Don't use numbers here!"));
-                }
+                //if (myTokenTag.Tag.type == SLangTokenType.NumericLiteral)
+                //{
+                //    SnapshotSpan tagSpan = myTokenTag.Span.GetSpans(_sourceBuffer)[0];
+                //    yield return new TagSpan<IErrorTag>(tagSpan, new ErrorTag(PredefinedErrorTypeNames.SyntaxError, "Don't use numbers here!"));
+                //}
             }
+            yield return null;
         }
     }
 }
