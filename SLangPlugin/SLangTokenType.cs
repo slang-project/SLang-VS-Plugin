@@ -8,7 +8,6 @@ namespace SLangPlugin
 {
     public enum SLangTokenType
     {
-        Identifier, Keyword, Comment, Operator, StringLiteral, NumericLiteral, Other, Ignore, Whitespace,
-        Unit
+        Identifier, Keyword, Comment, Operator, StringLiteral, NumericLiteral, Other, Ignore, Whitespace, Unit
     }
 }

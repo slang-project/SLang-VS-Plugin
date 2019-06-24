@@ -47,18 +47,16 @@ namespace SLangPlugin.QuickInfo
             _tagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(textBuffer) as SLangTokenTagger;
         }
 
-        private string extractType(int line, int pos)
+        private string extractType(SnapshotPoint point)
         {
             foreach (var tag in _tagger._lastTags)
             {
-                SLang.Span span = tag.Tag.token.span;
-                if (line +1 >= span.begin.line && line+1 <= span.end.line && pos+1 >= span.begin.pos && pos+1 <= span.end.pos)
+                if (tag.Span.Start <= point && tag.Span.End > point)
                 {
-                    string name = tag.Tag.token.category.ToString();
-                    return name;
+                    return tag.Tag.token.category.ToString();
                 }
             }
-            return "";
+            return null;
         }
 
         // This is called on a background thread.
@@ -68,11 +66,14 @@ namespace SLangPlugin.QuickInfo
 
             if (triggerPoint != null)
             {
+                SnapshotPoint tp = (SnapshotPoint)triggerPoint;
                 var line = triggerPoint.Value.GetContainingLine();
                 var lineNumber = triggerPoint.Value.GetContainingLine().LineNumber;
                 var lineOffset = triggerPoint.Value.Position - line.Start.Position;
 
-                string type = extractType(lineNumber, lineOffset);
+                string type = extractType(tp);
+
+                if (type == null) return Task.FromResult<QuickInfoItem>(null);
 
                 var lineSpan = _textBuffer.CurrentSnapshot.CreateTrackingSpan(line.Extent, SpanTrackingMode.EdgeInclusive);
 

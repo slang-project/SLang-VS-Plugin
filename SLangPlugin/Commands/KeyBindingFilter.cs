@@ -28,12 +28,15 @@ namespace SLangPlugin.Commands
         //[Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))]
         internal System.IServiceProvider _serviceProvider = null;
         GoToDefinitionCommandHandler _goToDefinitionCommandHandler;
+        SLangTokenTagger _generalTagger;
 
         public KeyBindingCommandFilter(IWpfTextView textView, System.IServiceProvider serviceProvider)
         {
             m_textView = textView;
             _serviceProvider = serviceProvider;
-            _goToDefinitionCommandHandler = new GoToDefinitionCommandHandler(_serviceProvider, m_textView);
+
+            _generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(m_textView.TextBuffer) as SLangTokenTagger;
+            _goToDefinitionCommandHandler = new GoToDefinitionCommandHandler(_serviceProvider, m_textView, _generalTagger);
         }
 
         public void showInfoMessage(string message)
@@ -120,8 +123,9 @@ namespace SLangPlugin.Commands
                         return VSConstants.S_OK;
 
                     case (uint)VSConstants.VSStd97CmdID.GotoDefn:
-                        showInfoMessage($"GoToDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
-                        _goToDefinitionCommandHandler.NavigateTo("C:\\Users\\Maksim Surkov\\source\\repos\\SLangProjectTemplate14\\App.slang", 1, 1); // TODO: replace with actual search call
+                        //showInfoMessage($"GoToDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        _goToDefinitionCommandHandler.PerformSearch(m_textView.TextBuffer, caretPoint);
+                        //_goToDefinitionCommandHandler.NavigateTo("C:\\Users\\Maksim Surkov\\source\\repos\\SLangProjectTemplate14\\App.slang", 1, 1); // TODO: replace with actual search call
                         return VSConstants.S_OK;
                 }
             }

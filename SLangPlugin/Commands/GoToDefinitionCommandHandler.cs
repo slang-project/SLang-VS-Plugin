@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition;
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace SLangPlugin.Commands
 {
@@ -16,14 +20,59 @@ namespace SLangPlugin.Commands
         readonly ITextView _textView;
         readonly ITextBuffer _textBuffer;
 
-        public GoToDefinitionCommandHandler(IServiceProvider serviceProvider, ITextView textView)
+        SLangTokenTagger _generalTagger;
+
+        public GoToDefinitionCommandHandler(IServiceProvider serviceProvider, ITextView textView, SLangTokenTagger generalTagger)
         {
             _serviceProvider = serviceProvider;
             _textView = textView;
             _textBuffer = textView.TextBuffer;
+            _generalTagger = generalTagger;
         }
 
-        public void NavigateTo(string targetFilepath, int targetLine, int targetColumn)
+        public void showInfoMessage(string message)
+        {
+            VsShellUtilities.ShowMessageBox(
+                            _serviceProvider,
+                            message,
+                            "Go To Definition Results",
+                            OLEMSGICON.OLEMSGICON_INFO,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+        }
+        private void FindSymbolInProject(string unitname)
+        {
+            //ThreadHelper.ThrowIfNotOnUIThread();
+            //DTE2 dte = _serviceProvider.GetService(typeof(DTE)) as DTE2;
+            //var projects = dte.ActiveSolutionProjects;
+            var currentPath = _textBuffer.GetTextDocument().FilePath;
+
+            IList<SLang.DECLARATION> decls = ASTUtilities.GetUnitsAndStandalones(_textBuffer);
+            foreach(var decl in decls)
+            {
+                if (decl.name.identifier.Equals(unitname))
+                {
+                    NavigateTo(currentPath, decl.span.begin.line - 1, decl.span.begin.pos - 2);
+                    return;
+                }
+            }
+            showInfoMessage("Definition Not Found.");
+            
+        }
+
+        public void PerformSearch(ITextBuffer textBuffer, SnapshotPoint point) // make bool to check and show message in caller
+        {
+            foreach (var tag in _generalTagger._lastTags)
+            {
+                if (tag.Span.Start <= point && tag.Span.End > point)
+                {
+                    FindSymbolInProject(tag.Tag.token.image);
+                    return;
+                }
+            }
+        }
+
+        private void NavigateTo(string targetFilepath, int targetLine, int targetColumn)
         {
             string sourceFilepath = _textBuffer.GetTextDocument().FilePath;
             if (sourceFilepath == targetFilepath)

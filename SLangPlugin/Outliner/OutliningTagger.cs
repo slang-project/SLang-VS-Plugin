@@ -90,6 +90,8 @@ namespace SLangPlugin.Outliner
 
             SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(_buffer) as SLangTokenTagger;
             _outlineTokens = generalTagger._lastTags;
+
+
             _regions = new List<Region>();
             CreateOutlineRegions();
             _buffer.Changed += BufferChanged;
@@ -269,6 +271,8 @@ namespace SLangPlugin.Outliner
 
         void CreateOutlineRegions()
         {
+            //IList<SLang.DECLARATION> decls = ASTUtilities.GetUnitsAndStandalones(_buffer);
+
             ITextSnapshot newSnapshot = _buffer.CurrentSnapshot;
             List<Region> newRegions = new List<Region>();
 

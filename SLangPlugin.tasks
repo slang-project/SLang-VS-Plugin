@@ -1,0 +1,10 @@
+[
+  {
+    "$type": "VSToDoList.Models.Task, VSToDoList",
+    "Name": null,
+    "IsDone": false,
+    "IsExpanded": false,
+    "SubTasks": [],
+    "Status": 0
+  }
+]

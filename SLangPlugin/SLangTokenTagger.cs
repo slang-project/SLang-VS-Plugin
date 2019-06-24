@@ -41,6 +41,7 @@ namespace SLangPlugin
     #endregion
 
     #region Tagger
+
     internal sealed class SLangTokenTagger : ITagger<SLangTokenTag>
     {
         ITextBuffer _buffer;

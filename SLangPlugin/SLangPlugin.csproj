@@ -56,6 +56,7 @@
     <Compile Include="Completion\CompletionSource.cs" />
     <Compile Include="Completion\ElementCatalog.cs" />
     <Compile Include="customIconsMonikers.cs" />
+    <Compile Include="Helpers\ASTUtilities.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
     <Compile Include="ProjectProperties.cs" />
@@ -130,9 +131,7 @@
       <Name>SLang</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <XamlPropertyRule Include="BuildSystem\Rules\debugger_general.xaml">
       <SubType>Designer</SubType>
