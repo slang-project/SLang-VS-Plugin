@@ -49,7 +49,7 @@ namespace SLangPlugin.QuickInfo
 
         private string extractType(SnapshotPoint point)
         {
-            foreach (var tag in _tagger._lastTags)
+            foreach (var tag in _tagger._currentTags)
             {
                 if (tag.Span.Start <= point && tag.Span.End > point)
                 {

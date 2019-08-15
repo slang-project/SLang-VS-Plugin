@@ -71,7 +71,7 @@ namespace SLangPlugin.Completion
             StructureNavigatorSelector = structureNavigatorSelector;
 
             SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(textView.TextBuffer) as SLangTokenTagger;
-            _lastTags = generalTagger._lastTags;
+            _lastTags = generalTagger._currentTags;
         }
 
         public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token)

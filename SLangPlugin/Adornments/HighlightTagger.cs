@@ -46,7 +46,7 @@ namespace SLangPlugin.Adornments
             _textBuffer = textBuffer;
             
             SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(_textBuffer) as SLangTokenTagger;
-            _lastTags = generalTagger._lastTags;
+            _lastTags = generalTagger._currentTags;
             
             // initialize empty highlights list
             _lastHighlights = new List<ITagSpan<TextMarkerTag>>();

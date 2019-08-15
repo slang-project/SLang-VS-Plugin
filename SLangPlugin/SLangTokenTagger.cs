@@ -10,7 +10,21 @@ using System.Threading.Tasks;
 
 namespace SLangPlugin
 {
+    #region Tag Types
+    /// <summary>
+    /// Language tokens distiguished by editor tools
+    /// </summary>
+    public enum SLangTokenType
+    {
+        Identifier, Keyword, Comment, Operator, StringLiteral,
+        NumericLiteral, Other, Ignore, Whitespace, Unit
+    }
+    #endregion
+
     #region Tag Structure
+    /// <summary>
+    /// Container that represents single token
+    /// </summary>
     public class SLangTokenTag : ITag
     {
         public SLangTokenType type { get; private set; }
@@ -23,6 +37,26 @@ namespace SLangPlugin
         }
 
     }
+
+    public class SLangTokenTagSpanEqualityComparer : IEqualityComparer<ITagSpan<SLangTokenTag>>
+    {
+        public bool Equals(ITagSpan<SLangTokenTag> x, ITagSpan<SLangTokenTag> y)
+        {
+            // TODO: remove this mess, make a better equality comparison, probably inside token itself
+            var codeComp = x.Tag.token.code.Equals(y.Tag.token.code);
+            var spanComp = x.Tag.token.span.begin.line.Equals(y.Tag.token.span.begin.line) &&
+                           x.Tag.token.span.begin.pos.Equals(y.Tag.token.span.begin.pos) &&
+                           x.Tag.token.span.end.line.Equals(y.Tag.token.span.end.line) &&
+                           x.Tag.token.span.end.pos.Equals(y.Tag.token.span.end.pos);
+            return codeComp && spanComp;
+        }
+
+        public int GetHashCode(ITagSpan<SLangTokenTag> obj)
+        {
+            return obj.Tag.token.code.GetHashCode() ^
+                   obj.Tag.token.span.GetHashCode();
+        }
+    }
     #endregion
 
     #region Tagger Provider
@@ -34,19 +68,23 @@ namespace SLangPlugin
     {
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
-            Func<ITagger<T>> creator = delegate () { return new SLangTokenTagger(buffer) as ITagger<T>; };
+            Func<ITagger<T>> creator = () => { return new SLangTokenTagger(buffer) as ITagger<T>; };
             return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(creator);
         }
     }
     #endregion
 
     #region Tagger
-
+    /// <summary>
+    /// Main tags source for other tools, produces tags with full information.
+    /// </summary>
     internal sealed class SLangTokenTagger : ITagger<SLangTokenTag>
     {
         ITextBuffer _buffer;
         ITextSnapshot _snapshot;
-        public readonly IList<ITagSpan<SLangTokenTag>> _lastTags = new List<ITagSpan<SLangTokenTag>>();
+        
+        public IList<ITagSpan<SLangTokenTag>> _currentTags = new List<ITagSpan<SLangTokenTag>>(),
+                                              _previousTags = new List<ITagSpan<SLangTokenTag>>();
 
         internal SLangTokenTagger(ITextBuffer buffer)
         {
@@ -66,14 +104,32 @@ namespace SLangPlugin
 
             _snapshot = _buffer.CurrentSnapshot;
 
+            // scan the document and extract all tags
             PerformReTag();
-            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot.GetLineFromLineNumber(0).Start, 
-                _snapshot.GetLineFromLineNumber(_snapshot.LineCount - 1).End).TranslateTo(_snapshot, SpanTrackingMode.EdgeExclusive)));
+
+            // find what regions have acually changed
+            var comp = new SLangTokenTagSpanEqualityComparer();
+            var symmetricDifference = _previousTags.Except(_currentTags, comp)
+                                .Union(_currentTags.Except(_previousTags, comp));
+
+            // stop if nothing to update
+            if (!symmetricDifference.Any()) return;
+
+            // transform for updater
+            var symDiffSpans = new NormalizedSnapshotSpanCollection(
+                            symmetricDifference.Select(tag => tag.Span
+                            .TranslateTo(_buffer.CurrentSnapshot, SpanTrackingMode.EdgeExclusive)));
+
+            // inform about new tags information
+            foreach(SnapshotSpan span in symDiffSpans)
+                TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
+
         }
 
         private void PerformReTag()
         {
-            _lastTags.Clear();
+            _previousTags = new List<ITagSpan<SLangTokenTag>>(_currentTags);
+            _currentTags.Clear();
             SLang.Reader reader = new SLang.Reader(_snapshot.GetText());
             SLang.Tokenizer tokenizer = new SLang.Tokenizer(reader, (SLang.Options)null);
 
@@ -86,7 +142,7 @@ namespace SLangPlugin
                 {
                     Span currentTokenSpan = ConvertToSpan(token.span, _snapshot);
                     SnapshotSpan tokenSpan = new SnapshotSpan(_snapshot, currentTokenSpan);
-                    _lastTags.Add(new TagSpan<SLangTokenTag>(tokenSpan, currentTag));
+                    _currentTags.Add(new TagSpan<SLangTokenTag>(tokenSpan, currentTag));
                 }
                 token = tokenizer.getNextToken();
             }
@@ -96,7 +152,7 @@ namespace SLangPlugin
         {
             if (spans.Count > 0)
             {
-                foreach (var tagSpan in _lastTags ?? Enumerable.Empty<ITagSpan<SLangTokenTag>>())
+                foreach (var tagSpan in _currentTags ?? Enumerable.Empty<ITagSpan<SLangTokenTag>>())
                 {
                     yield return tagSpan;
                 }
@@ -105,6 +161,7 @@ namespace SLangPlugin
 
         private Span ConvertToSpan(SLang.Span span, ITextSnapshot containingSnapshot)
         {
+            // TODO: Justify magic numbers
             int beginLine = span.begin.line - 1,
                 endLine = span.end.line - 1,
                 beginPos = span.begin.pos - 2,

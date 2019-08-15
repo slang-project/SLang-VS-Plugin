@@ -10,6 +10,19 @@ using System.Windows.Media;
 
 namespace SLangPlugin.Classification
 {
+    #region Classification Type
+    class ClassificationType
+    {
+        /// <summary>
+        /// Defines the "Unit" classification type.
+        /// </summary>
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("unit")]
+        internal static ClassificationTypeDefinition SLangUnitType = null;
+    }
+    #endregion
+
+    #region Classification Format
     class ClassificationFormat
     {
         /// <summary>
@@ -38,4 +51,5 @@ namespace SLangPlugin.Classification
             }
         }
     }
+    #endregion
 }

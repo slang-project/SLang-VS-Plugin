@@ -62,7 +62,7 @@ namespace SLangPlugin.Commands
 
         public void PerformSearch(ITextBuffer textBuffer, SnapshotPoint point) // make bool to check and show message in caller
         {
-            foreach (var tag in _generalTagger._lastTags)
+            foreach (var tag in _generalTagger._currentTags)
             {
                 if (tag.Span.Start <= point && tag.Span.End > point)
                 {

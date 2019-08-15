@@ -46,7 +46,7 @@ namespace SLangPlugin.Outliner
             ITagAggregator<SLangTokenTag> SLangTagAggregator =
                                             aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
 
-            Func<ITagger<T>> creator = delegate () { return new OutliningTagger(buffer, _textEditorFactoryService,
+            Func<ITagger<T>> creator = () => { return new OutliningTagger(buffer, _textEditorFactoryService,
                 _editorOptionsFactoryService, _projectionBufferFactoryService, SLangTagAggregator, contentTypeRegistryService) as ITagger<T>; };
             return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(creator);
         }
@@ -89,7 +89,7 @@ namespace SLangPlugin.Outliner
             _aggregator = SLangTagAggregator;
 
             SLangTokenTagger generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(_buffer) as SLangTokenTagger;
-            _outlineTokens = generalTagger._lastTags;
+            _outlineTokens = generalTagger._currentTags;
 
 
             _regions = new List<Region>();

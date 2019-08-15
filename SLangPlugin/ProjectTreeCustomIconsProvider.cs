@@ -8,12 +8,10 @@ using Microsoft.VisualStudio.ProjectSystem;
 namespace SLangPlugin
 {
     /// <summary>
-    /// Updates nodes in the project tree by overriding property values calcuated so far by lower priority providers.
+    /// Update nodes in the project tree by overriding property values calcuated so far by lower priority providers.
     /// </summary>
     [Export(typeof(IProjectTreePropertiesProvider))]
     [AppliesTo(MyUnconfiguredProject.UniqueCapability)]
-    // TODO: Consider removing the Order attribute as it typically should not be needed when creating a new project type. It may be needed when customizing an existing project type to override the default behavior (e.g. the default C# implementation).
-    //[Order(1000)]
     internal class ProjectTreeCustomIconsProvider : IProjectTreePropertiesProvider
     {
         const string ITEM_TYPE = "SLangCompile";

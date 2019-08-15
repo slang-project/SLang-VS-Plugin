@@ -48,7 +48,6 @@
     <Compile Include="Adornments\HighlightTagger.cs" />
     <Compile Include="Classification\ClassificationFormat.cs" />
     <Compile Include="Classification\ClassificationMapping.cs" />
-    <Compile Include="Classification\ClassificationType.cs" />
     <Compile Include="Classification\SLangClassifier.cs" />
     <Compile Include="Commands\GoToDefinitionCommandHandler.cs" />
     <Compile Include="Commands\KeyBindingFilter.cs" />
@@ -64,7 +63,6 @@
     <Compile Include="QuickInfo\QuickInfo.cs" />
     <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
-    <Compile Include="SLangTokenType.cs" />
     <Compile Include="Comment\CommandBindings.cs" />
     <Compile Include="Comment\CommentSelectedCommand.cs" />
     <Compile Include="Constants.cs" />

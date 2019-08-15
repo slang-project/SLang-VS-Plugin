@@ -36,7 +36,7 @@ namespace SLangPlugin.Classification
         internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
 
         [Import]
-        internal IStandardClassificationService standardClassificationService = null; // Set via MEF
+        internal IStandardClassificationService standardClassificationService = null;
 
         [Import]
         internal IClassificationTypeRegistryService classificationTypeRegistryService = null;
@@ -46,12 +46,11 @@ namespace SLangPlugin.Classification
             ITagAggregator<SLangTokenTag> SLangTagAggregator =
                                             aggregatorFactory.CreateTagAggregator<SLangTokenTag>(buffer);
 
-            Func<ITagger<T>> creator = delegate () { return new SLangClassifier(buffer, SLangTagAggregator,
+            Func<ITagger<T>> creator = () => { return new SLangClassifier(buffer, SLangTagAggregator,
                 standardClassificationService, classificationTypeRegistryService) as ITagger<T>; };
             return buffer.Properties.GetOrCreateSingletonProperty<ITagger<T>>(creator);
         }
     }
-
     #endregion
 
     #region Tagger
@@ -60,7 +59,7 @@ namespace SLangPlugin.Classification
     {
 
         ITextBuffer _buffer;
-        ITextSnapshot _snapshot;
+        //ITextSnapshot _snapshot;
         ITagAggregator<SLangTokenTag> _aggregator;
         IDictionary<SLangTokenType, IClassificationType> _SLangTypes;
 
@@ -68,7 +67,7 @@ namespace SLangPlugin.Classification
             IStandardClassificationService typeService, IClassificationTypeRegistryService typeRegistry)
         {
             _buffer = buffer;
-            _snapshot = buffer.CurrentSnapshot;
+            //_snapshot = buffer.CurrentSnapshot;
             _aggregator = SLangTagAggregator;
             InitializeClassifierMapping(typeService, typeRegistry);
             buffer.Changed += BufferChanged;
@@ -98,24 +97,23 @@ namespace SLangPlugin.Classification
             //bool containsSpanChange = false;
             //foreach (var change in args.Changes)
             //{
-            //    if (change.NewText.Contains("*") || change.NewText.Contains("/")) // detect if any
+                
+            //    if (change.NewText.Contains("*") || change.NewText.Contains("/"))
             //    {
             //        containsSpanChange = true;
             //        break;
             //    }
             //}
             //if (!containsSpanChange)
-            //    return; 
+            //    return;
 
 
             // if current change does not correspond to latest version of buffer, ignore until newer
             if (args.After != _buffer.CurrentSnapshot)
                 return;
 
-            _snapshot = _buffer.CurrentSnapshot;
-
-            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_snapshot, 0,
-                    _snapshot.Length)));
+            TagsChanged?.Invoke(obj, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, 0,
+                    _buffer.CurrentSnapshot.Length)));
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
