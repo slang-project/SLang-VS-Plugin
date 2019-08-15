@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace SLangPlugin
@@ -23,10 +25,19 @@ namespace SLangPlugin
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(SLangPluginPackage.PackageGuid)]
     public sealed class SLangPluginPackage : AsyncPackage
     {
+        public static SLangPluginPackage Instance;
+
+        Library _library;
+        public void SetFindResult(IVsSimpleObjectList2 findResults)
+        {
+            _library.OnFindAllReferencesDone(findResults);
+        }
+
         /// <summary>
         /// SLangPluginPackage GUID string.
         /// </summary>
@@ -51,6 +62,8 @@ namespace SLangPlugin
         /// </summary>
         internal const string DefaultNamespace = "SLangPlugin";
 
+        uint _objectManagerCookie;
+
         #region Package Members
 
         /// <summary>
@@ -65,6 +78,35 @@ namespace SLangPlugin
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            Instance = this;
+
+            // setup and refister library to perform object search, such as FindAllReferences
+            _library = new Library();
+
+            if(_objectManagerCookie == 0)
+            {
+                var objManager =  await this.GetServiceAsync(typeof(SVsObjectManager)) as IVsObjectManager2;
+
+                if (null != objManager)
+                    ErrorHandler.ThrowOnFailure(objManager.RegisterSimpleLibrary(_library, out _objectManagerCookie));
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+
+                var om = GetService(typeof(SVsObjectManager)) as IVsObjectManager2;
+                if (om != null)
+                    om.UnregisterLibrary(_objectManagerCookie);
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
         }
 
         #endregion

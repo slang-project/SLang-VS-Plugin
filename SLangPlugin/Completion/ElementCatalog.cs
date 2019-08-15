@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// TODO: delete when not needed for reference
+
 namespace SLangPlugin.Completion
 {
     [Export]

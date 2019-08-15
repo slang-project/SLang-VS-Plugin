@@ -61,6 +61,10 @@
     <Compile Include="ProjectProperties.cs" />
     <Compile Include="ProjectTreeCustomIconsProvider.cs" />
     <Compile Include="QuickInfo\QuickInfo.cs" />
+    <Compile Include="LibraryUtils\GoToInfoLibraryNode.cs" />
+    <Compile Include="LibraryUtils\Library.cs" />
+    <Compile Include="LibraryUtils\LibraryNode.cs" />
+    <Compile Include="Commands\FindAllReferencesCommandHandler.cs" />
     <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="Comment\CommandBindings.cs" />
