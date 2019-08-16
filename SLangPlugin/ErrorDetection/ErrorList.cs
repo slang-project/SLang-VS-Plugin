@@ -4,6 +4,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace SLangPlugin
 {
+    // TODO: this is legacy approach, move to new API
+    // https://github.com/microsoft/VSSDK-Extensibility-Samples/tree/master/ErrorList
+
     class ErrorList
     {
         // No use except getter
@@ -62,7 +65,7 @@ namespace SLangPlugin
                 Line = line,
                 Column = column,
                 HierarchyItem = hierarchyItem,
-                HelpKeyword = "Help Keyword Test"
+                
             };
 
             error.Navigate += (sender, e) =>
@@ -79,7 +82,17 @@ namespace SLangPlugin
             _errorListProvider.Show();
         }
 
-        public void ClearAll()
+        // TODO: consider this mechanism for unsubsribing from navigation
+        //foreach (object task in this.errorListProvider.Tasks)
+        //    {
+        //        ErrorListItem errorTask = task as ErrorListItem;
+
+        //        if (errorTask != null)
+        //        {
+        //            errorTask.Navigate -= this.OnErrorListItemNavigate;
+        //        }
+        //}
+public void ClearAll()
         {
             _errorListProvider.Tasks.Clear();    // clear previously created
         }
