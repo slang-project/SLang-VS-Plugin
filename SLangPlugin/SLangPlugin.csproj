@@ -55,6 +55,7 @@
     <Compile Include="Completion\CompletionSource.cs" />
     <Compile Include="Completion\ElementCatalog.cs" />
     <Compile Include="customIconsMonikers.cs" />
+    <Compile Include="ErrorDetection\ErrorList.cs" />
     <Compile Include="Helpers\ASTUtilities.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />

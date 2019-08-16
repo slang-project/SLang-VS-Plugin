@@ -147,7 +147,9 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd12CmdID.PeekDefinition:
-                        showInfoMessage($"Not Implemented Yet.\nPeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        var errorList = new ErrorList();
+                        errorList.PerformTest();
+                        //showInfoMessage($"Not Implemented Yet.\nPeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
                         return VSConstants.S_OK;
                 }
             }
