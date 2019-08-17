@@ -55,12 +55,17 @@
     <Compile Include="Completion\CompletionSource.cs" />
     <Compile Include="Completion\ElementCatalog.cs" />
     <Compile Include="customIconsMonikers.cs" />
+    <Compile Include="ErrorDetection\ErrorList.cs" />
     <Compile Include="Helpers\ASTUtilities.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
     <Compile Include="ProjectProperties.cs" />
     <Compile Include="ProjectTreeCustomIconsProvider.cs" />
     <Compile Include="QuickInfo\QuickInfo.cs" />
+    <Compile Include="LibraryUtils\GoToInfoLibraryNode.cs" />
+    <Compile Include="LibraryUtils\Library.cs" />
+    <Compile Include="LibraryUtils\LibraryNode.cs" />
+    <Compile Include="Commands\FindAllReferencesCommandHandler.cs" />
     <Compile Include="SLangDebuggerLaunchProvider.cs" />
     <Compile Include="SLangTokenTagger.cs" />
     <Compile Include="Comment\CommandBindings.cs" />

@@ -28,6 +28,7 @@ namespace SLangPlugin.Commands
         //[Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))]
         internal System.IServiceProvider _serviceProvider = null;
         GoToDefinitionCommandHandler _goToDefinitionCommandHandler;
+        FindAllReferencesCommandHandler _findAllReferencesCommandHandler;
         SLangTokenTagger _generalTagger;
 
         public KeyBindingCommandFilter(IWpfTextView textView, System.IServiceProvider serviceProvider)
@@ -37,6 +38,7 @@ namespace SLangPlugin.Commands
 
             _generalTagger = new SLangTokenTaggerProvider().CreateTagger<SLangTokenTag>(m_textView.TextBuffer) as SLangTokenTagger;
             _goToDefinitionCommandHandler = new GoToDefinitionCommandHandler(_serviceProvider, m_textView, _generalTagger);
+            _findAllReferencesCommandHandler = new FindAllReferencesCommandHandler(_serviceProvider, m_textView, _generalTagger);
         }
 
         public void showInfoMessage(string message)
@@ -113,7 +115,18 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd97CmdID.FindReferences:
-                        showInfoMessage($"Not Implemented Yet.\nFindAllReferences from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        // TODO: implement handler, only test code currently
+                        var locations = new[]
+                        {
+                            new Location(
+                                "C:\\Users\\Maksim Surkov\\projects\\fsharp\\DEVGUIDE.md",
+                                2,
+                                2
+                                )
+                        };
+                        _findAllReferencesCommandHandler.ShowInFindResultWindow(locations);
+
+                        //showInfoMessage($"Not Implemented Yet.\nFindAllReferences from symbol at line: {lineNumber}, offset:{lineOffset}");
                         // To consider https://github.com/Microsoft/PTVS/blob/master/Python/Product/PythonTools/PythonTools/Navigation/EditFilter.cs
                         return VSConstants.S_OK;
 
@@ -134,7 +147,9 @@ namespace SLangPlugin.Commands
                 switch (nCmdID)
                 {
                     case (uint)VSConstants.VSStd12CmdID.PeekDefinition:
-                        showInfoMessage($"Not Implemented Yet.\nPeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
+                        var errorList = new ErrorList();
+                        errorList.PerformTest();
+                        //showInfoMessage($"Not Implemented Yet.\nPeekDefinition from symbol at line: {lineNumber}, offset:{lineOffset}");
                         return VSConstants.S_OK;
                 }
             }
